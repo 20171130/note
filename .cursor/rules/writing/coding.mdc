@@ -3,12 +3,16 @@ description: Coding principles — minimize code, no docs/error handling unless 
 globs: **/*.py, **/*.ts, **/*.tsx, **/*.js, **/*.jsx, **/*.go, **/*.rs, **/*.c, **/*.cc, **/*.cpp, **/*.h, **/*.hpp, **/*.java, **/*.sh, **/*.ps1, **/*.rb, **/*.lua, **/*.zig, **/*.swift, **/*.kt, **/*.scala
 alwaysApply: false
 ---
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔴 USER PRINCIPLES
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-0. CLARIFY FIRST  
-   If anything is confusing, ambiguous, or unexpected, pause and ask the user for further instructions.
+# Core
+
+1. CLARIFY FIRST  
+   If anything is confusing, ambiguous, or unexpected, pause and ask before proceeding.
+
+2. ASK IF BEFORE HOW  
+   Before implementing any change, evaluate whether it is necessary and well-designed. Time spent vetting a design should be proportional to the time needed to implement it. Consider alternatives and discuss with the user. Push back on requests that are not well-considered.
+
+# Code Style
 
 1. MINIMIZE CODE  
    Write only what is explicitly requested. Do not add anything extra.
@@ -19,22 +23,19 @@ alwaysApply: false
    → No docstrings, READMEs, or additional comments.
 
 3. LET IT CRASH  
-   Do not add error handling, unless it is expected like network instability.
+   Do not add error handling unless failure is inherently non-deterministic (e.g. network I/O).  
    → No try/except blocks, guards, or fallback branches.  
-   → Stack traces are valuable for debugging; error handling hides bugs.  
+   → Stack traces are valuable; error handling hides bugs.  
    → Do not add checks like `if x is not None` when `x` is expected to exist.
 
 4. NO UNEXPECTED DEFAULT VALUES  
    → Do not use safe accessors like `dict.get(key, default)` or `getattr(obj, attr, default)`.  
-   → Default values are allowed **only** in function signatures and `argparse`.  
+   → Default values are allowed only in function signatures and `argparse`.  
    → If a required key or attribute is missing, let the program crash.
-   
-When debugging:
 
-Always identify the root cause before attempting any fix.
+# Debugging
 
-If the cause is obvious, clearly explain it to the user.
-
-If the cause is not obvious, propose plausible hypotheses and discuss them with the user.
-
-Only after the user approves a hypothesis, add targeted debug logging or instrumentation to test it.
+1. Always identify the root cause before attempting any fix.
+2. If the cause is obvious, explain it clearly to the user.
+3. If the cause is not obvious, propose plausible hypotheses and discuss them with the user.
+4. Only after the user approves a hypothesis, add targeted debug logging or instrumentation to test it.

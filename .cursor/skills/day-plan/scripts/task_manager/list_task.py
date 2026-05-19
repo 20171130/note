@@ -7,6 +7,10 @@ options:
     default --upcoming 0, only show today's tasks, Notice that a task without schedule or due date needs to be scheduled and is always upcoming.
 --finished: show finished/completed tasks
 --all: show all tasks
+
+Notice that 
+`🔁 every 3 days` is an unscheduled task
+But `🔁 every week on Wednesday, Thursday` is scheduled 
 """
 import argparse
 import datetime
@@ -20,6 +24,11 @@ sys.stdout.reconfigure(encoding="utf-8")
 WINDOW_DAYS = 7
 
 
+def is_interval_cron(cron_expr: str | None) -> bool:
+    """Interval-based recurrence (e.g. 'every 3 days') — treated as unscheduled."""
+    return cron_expr is not None and cron_expr.startswith("every ")
+
+
 def format_link(task) -> str:
     rel_path = "/".join(task.source.parts)
     return f"[{task.source.name}:{task.line}]({rel_path}#L{task.line})"
@@ -31,6 +40,9 @@ def collect_upcoming(tasks, today: datetime.date, window_days: int):
         ref_str = t.scheduled or t.due
         # If it's a recurring task, project it forward into the window
         if t.cron_expr:
+            # Interval-based recurrence (every N days) is unscheduled — skip here
+            if is_interval_cron(t.cron_expr):
+                continue
             if ref_str:
                 sched_date = datetime.date.fromisoformat(ref_str)
                 if sched_date <= today + datetime.timedelta(days=window_days):
@@ -81,7 +93,7 @@ def print_upcoming(rows, today):
 
 
 def print_recurring(tasks):
-    rec = sorted([t for t in tasks if t.cron_expr], key=lambda t: t.cron_expr)
+    rec = sorted([t for t in tasks if t.cron_expr and not is_interval_cron(t.cron_expr)], key=lambda t: t.cron_expr)
     print(f"# Recurring ({len(rec)})")
     for t in rec:
         print(f"  {marker_of(t)} {t.body}  {format_link(t)}  (cron: {t.cron_expr})")
@@ -89,7 +101,11 @@ def print_recurring(tasks):
 
 
 def print_unscheduled(tasks):
-    free = [t for t in tasks if not t.cron_expr and not t.scheduled and t.state not in ("x", "X")]
+    free = [
+        t for t in tasks
+        if t.state not in ("x", "X")
+        and ((not t.cron_expr and not t.scheduled) or is_interval_cron(t.cron_expr))
+    ]
     print(f"# UNSCHEDULED: Needs Scheduling & Attention ({len(free)})")
     for t in free:
         print(f"  {marker_of(t)} {t.body}  {format_link(t)}")
