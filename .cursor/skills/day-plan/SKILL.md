@@ -11,14 +11,14 @@ Start the day by discussing Henry's plan. Schedule open tasks into available tim
 2. Flag unscheduled tasks — every task need a date. Ask Henry to find a date for it.
 3. Reschedule overdue tasks for today, without changing the due date.
 4. Update `.cursor/rules/todo.mdc` with today's plan, grouped by time slots (morning, afternoon, evening). Omit list ordinals, since Henry will reorder to confirm his priorities.
-5. Append absolute source links relative to repo root (e.g. `/log/{date}.md#L12` ).
-6. List tasks with an exact time and ask Henry to set alarms. 
+5. Append source links using markdown section anchors (e.g. `[2026-05-19.md > Afternoon](/log/2026-05-19.md#afternoon)`). Do **not** use line numbers — they break when the file is edited.
+6. List tasks with an exact time and ask Henry to set alarms.
 
 ## Task DSL
 
-- ⏳ scheduled 
+- ⏳ scheduled
 - 🛫 start, 📅 due: the range task can be scheduled
-- 🔁 recurring 
+- 🔁 recurring
     relative, e.g. `🔁 every 3 days`, used together with scheduled
     aboslute, e.g. `🔁 every weekday`, `🔁 every week on Monday` used without scheduled date
 - `[ ]` todo, `[/]` in progress, `[x]` done with `✅ YYYY-MM-DD`

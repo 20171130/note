@@ -1,30 +1,35 @@
 ---
 alwaysApply: true
 ---
-# Executing Plan
-
 Do not remove this section as it contains how I should push a plan with Henry.
 
-1. Check the current time. Flag unfinished tasks. Demand proper time management and push back on procrastination. Remind Henry of his next tasks whenever there is a natural break in the conversation.
-2. If he commits to a timeline or reschedules tasks, update the plan to hold him to his word.
-3. When Henry progress or finishes a task, maintain this file and source note to update the task status. It is also the right time to `log` our progress.
-4. If the schedule is underoccupied or tasks are finished early, run `py .cursor/skills/day-plan/scripts/task_manager/list_task.py --upcoming N_days` to suggest future tasks.
+# Executing Plan
+
+1. At every natural break, check the current time. Flag the next unfinished task and push back on procrastination.
+
+# Updating Plan
+
+1. When Henry makes progress or finishes a task, read the source file and update this plan accordingly.
+2. If he commits to a timeline or reschedules, update the plan to hold him to it.
+3. If the schedule has slack or tasks finish early, run `py .cursor/skills/day-plan/scripts/task_manager/list_task.py --upcoming N` to suggest future tasks.
 
 # Today's Plan
 
 ## Morning
-- [x] Check email + chats 🔁 every day ⏳ 2026-05-19 ✅ 2026-05-19 [2026-05-19.md:1](/log/2026-05-19.md#L1)
-- [x] Update status on internalfb.com 🔁 every weekday ⏳ 2026-05-19 ✅ 2026-05-19 [2026-05-19.md:2](/log/2026-05-19.md#L2)
-- [ ] 10:30-11:30 Biweekly meeting with professors 🔁 every 14 days ⏳ 2026-05-19 [2026-05-19.md:3](/log/2026-05-19.md#L3)
+- [x] Check email + chats 🔁 every day ⏳ 2026-05-19 ✅ 2026-05-19 [2026-05-19.md > Morning](/log/2026-05-19.md#morning)
+- [x] Update status on internalfb.com 🔁 every weekday ⏳ 2026-05-19 ✅ 2026-05-19 [2026-05-19.md > Morning](/log/2026-05-19.md#morning)
+- [x] 10:30-11:30 Biweekly meeting with professors 🔁 every 14 days ⏳ 2026-05-19 ✅ 2026-05-19 [2026-05-19.md > Morning](/log/2026-05-19.md#morning)
 
 ## Afternoon
-- [ ] 14:00 Meet with Muhammed ⏳ 2026-05-19 [2026-05-19.md:4](/log/2026-05-19.md#L4)
-- [ ] Resume VPO (KL threshold approach) ➕ 2026-05-08 ⏳ 2026-05-19 [2026-05-19.md:14](/log/2026-05-19.md#L14)
-- [ ] Discuss with Lele regarding multimodal models ➕ 2026-05-14 ⏳ 2026-05-19 [2026-05-19.md:19](/log/2026-05-19.md#L19)
-- [ ] Consider getting a box to pack dinner home and catch 18:30 bus ⏳ 2026-05-19 [2026-05-19.md:20](/log/2026-05-19.md#L20)
+- [x] 13:00 Migrate from laptop to work Mac ⏳ 2026-05-19 ✅ 2026-05-19 [2026-05-19.md > Afternoon](/log/2026-05-19.md#afternoon)
+- [x] Discuss with Lele regarding multimodal models ➕ 2026-05-14 ⏳ 2026-05-19 ✅ 2026-05-19 [2026-05-19.md > Morning](/log/2026-05-19.md#morning)
+- [ ] 14:30 Meet with Muhammed ⏳ 2026-05-19 [2026-05-19.md > Afternoon](/log/2026-05-19.md#afternoon)
+- [ ] Resume VPO (KL threshold approach) ➕ 2026-05-08 ⏳ 2026-05-19 [2026-05-19.md > Afternoon](/log/2026-05-19.md#afternoon)
+- [ ] Get lubricant and masturbation cup ⏳ 2026-05-19 [2026-05-19.md > Afternoon](/log/2026-05-19.md#afternoon)
 
 ## Evening
-- [ ] Talk to relatives 🔁 every week ➕ 2026-05-08 ⏳ 2026-05-19 [2026-05-19.md:12](/log/2026-05-19.md#L12)
-- [ ] Get lubricant and masturbation cup ⏳ 2026-05-19 [2026-05-19.md:13](/log/2026-05-19.md#L13)
-- [ ] Wash clothes 🔁 every week on Sunday ⏳ 2026-05-19 [2026-05-19.md:11](/log/2026-05-19.md#L11)
-- [ ] Shower and change clothes, go sleep before midnight 🔁 every day ⏳ 2026-05-19 [2026-05-19.md:10](/log/2026-05-19.md#L10)
+- [ ] Consider getting a box to pack dinner home and catch 18:30 bus ⏳ 2026-05-19 [2026-05-19.md > Evening](/log/2026-05-19.md#evening)
+- [ ] Revise the free bike and Clipper card Meta offers ⏳ 2026-05-19 [2026-05-19.md > Evening](/log/2026-05-19.md#evening)
+- [ ] Talk to relatives 🔁 every week ➕ 2026-05-08 ⏳ 2026-05-19 [2026-05-19.md > Evening](/log/2026-05-19.md#evening)
+- [ ] Wash clothes 🔁 every week on Sunday ⏳ 2026-05-19 [2026-05-19.md > Evening](/log/2026-05-19.md#evening)
+- [ ] Shower and change clothes, go sleep before midnight 🔁 every day ⏳ 2026-05-19 [2026-05-19.md > Evening](/log/2026-05-19.md#evening)

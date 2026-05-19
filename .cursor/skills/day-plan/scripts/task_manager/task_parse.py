@@ -6,7 +6,7 @@ Returns tasks with their source file and line number.
 By default only returns unfinished tasks, use --all to return all tasks..
 
 If a relative recurring task is found together with a finished instance, automatically increment dates:
-- 🔁 recurring 
+- 🔁 recurring
     relative, e.g. `🔁 every 3 days`, increments based on actual finished date
     aboslute, e.g. `🔁 every weekday`, `🔁 every week on Monday`, used without scheduled date, no need to touch
 
@@ -29,13 +29,21 @@ EXCLUDE_DIRS = {".obsidian", ".git", ".cursor"}
 
 TASK_RE = re.compile(r"^\s*- \[([ /xX])\] (.*)$")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
+HEADING_RE = re.compile(r"^(#{1,6})\s+(.+)$")
 
 SCHED_EMOJI = "⏳"
 DUE_EMOJI = "📅"
 RECUR_EMOJI = "🔁"
 
-DOW = {"sunday": 0, "monday": 1, "tuesday": 2, "wednesday": 3,
-       "thursday": 4, "friday": 5, "saturday": 6}
+DOW = {
+    "sunday": 0,
+    "monday": 1,
+    "tuesday": 2,
+    "wednesday": 3,
+    "thursday": 4,
+    "friday": 5,
+    "saturday": 6,
+}
 
 
 @dataclass
@@ -43,10 +51,11 @@ class Task:
     body: str
     state: str  # " " (todo) or "/" (in progress)
     source: Path  # relative to WORKSPACE_ROOT
-    line: int     # line number in the source file
+    line: int  # line number in the source file
     scheduled: str | None  # YYYY-MM-DD from ⏳
-    due: str | None        # YYYY-MM-DD from 📅
+    due: str | None  # YYYY-MM-DD from 📅
     cron_expr: str | None  # 5-field cron expression if 🔁 was translatable
+    section: str | None = None  # nearest heading above the task
 
 
 def field_matches(field: str, value: int) -> bool:
@@ -80,9 +89,11 @@ def cron_matches(expr: str, today: datetime.date) -> bool:
     _min, _hour, dom, mon, dow = expr.split()
     # cron DOW: Sun=0..Sat=6. Python isoweekday: Mon=1..Sun=7.
     cron_dow = today.isoweekday() % 7
-    return (field_matches(dom, today.day)
-            and field_matches(mon, today.month)
-            and field_matches(dow, cron_dow))
+    return (
+        field_matches(dom, today.day)
+        and field_matches(mon, today.month)
+        and field_matches(dow, cron_dow)
+    )
 
 
 def extract_date_after(text: str, emoji: str) -> str | None:
@@ -97,7 +108,7 @@ def parse_recurrence(body: str, scheduled: str | None) -> str | None:
     idx = body.find(RECUR_EMOJI)
     if idx == -1:
         return None
-    tail = body[idx + len(RECUR_EMOJI):].lower().strip()
+    tail = body[idx + len(RECUR_EMOJI) :].lower().strip()
     if re.match(r"every day\b", tail):
         return "0 3 * * *"
     if re.match(r"every weekday\b", tail):
@@ -154,17 +165,17 @@ def _next_cron_after(cron_expr: str, from_date: datetime.date) -> datetime.date:
 def get_finished_date(task: Task) -> datetime.date | None:
     if task.state not in ("x", "X"):
         return None
-    
+
     idx = task.body.find("✅")
     if idx != -1:
         m = DATE_RE.search(task.body, idx)
         if m:
             return datetime.date.fromisoformat(m.group(1))
-    
+
     m = DATE_RE.search(task.source.name)
     if m:
         return datetime.date.fromisoformat(m.group(1))
-    
+
     return None
 
 
@@ -178,19 +189,27 @@ def find_note_files(root: Path = WORKSPACE_ROOT) -> list[Path]:
     return files
 
 
-def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> list[Task]:
+def parse_all_tasks(
+    root: Path = WORKSPACE_ROOT, include_all: bool = False
+) -> list[Task]:
     tasks: list[Task] = []
     for filepath in find_note_files(root):
         source_rel = filepath.relative_to(root)
         with open(filepath, encoding="utf-8") as f:
             in_code_block = False
+            current_section = None
             for line_idx, raw in enumerate(f, start=1):
                 if raw.strip().startswith("```"):
                     in_code_block = not in_code_block
                     continue
                 if in_code_block:
                     continue
-                
+
+                hm = HEADING_RE.match(raw.rstrip())
+                if hm:
+                    current_section = hm.group(2).strip()
+                    continue
+
                 m = TASK_RE.match(raw)
                 if not m:
                     continue
@@ -200,8 +219,18 @@ def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> l
                 scheduled = extract_date_after(body, SCHED_EMOJI)
                 due = extract_date_after(body, DUE_EMOJI)
                 cron_expr = parse_recurrence(body, scheduled or due)
-                tasks.append(Task(body=body, state=state, source=source_rel, line=line_idx,
-                                  scheduled=scheduled, due=due, cron_expr=cron_expr))
+                tasks.append(
+                    Task(
+                        body=body,
+                        state=state,
+                        source=source_rel,
+                        line=line_idx,
+                        scheduled=scheduled,
+                        due=due,
+                        cron_expr=cron_expr,
+                        section=current_section,
+                    )
+                )
 
     # Post-processing: find latest finished date for each base body
     latest_finished: dict[str, datetime.date] = {}
@@ -212,7 +241,7 @@ def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> l
             if fdate:
                 if base not in latest_finished or fdate > latest_finished[base]:
                     latest_finished[base] = fdate
-                    
+
     # Update recurring tasks — only relative (interval-based) recurrence needs date increments.
     # Absolute recurrence (every weekday, every week on Monday, etc.) fires by cron, nothing to touch.
     for t in tasks:
@@ -225,8 +254,11 @@ def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> l
             fdate = latest_finished[base]
             period = cron_period_days(t.cron_expr)
             # Only advance ⏳ (scheduled) from the finished date; never touch 📅 (due).
-            next_sched = (fdate + datetime.timedelta(days=period)
-                          if period else _next_cron_after(t.cron_expr, fdate))
+            next_sched = (
+                fdate + datetime.timedelta(days=period)
+                if period
+                else _next_cron_after(t.cron_expr, fdate)
+            )
             if t.scheduled:
                 sched_date = datetime.date.fromisoformat(t.scheduled)
                 if next_sched > sched_date:
@@ -238,12 +270,14 @@ def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> l
 
     if not include_all:
         tasks = [t for t in tasks if t.state not in ("x", "X")]
-        
+
     return tasks
+
 
 if __name__ == "__main__":
     import argparse
     import sys
+
     sys.stdout.reconfigure(encoding="utf-8")
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--all", action="store_true", help="Return all tasks")
