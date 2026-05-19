@@ -5,14 +5,21 @@ Ignores .cursor and .git directories.
 Returns tasks with their source file and line number.
 By default only returns unfinished tasks, use --all to return all tasks..
 
-If an recurring task is found together with a finished instance, automatically increment the next scheduled date.
-
-Example:
-- [ ] Task 1 🔁 every 3 days ⏳ 2026-05-15
-- [x] Task 1 ✅ 2026-05-18
-The next scheduled date for Task 1 will be 2026-05-21.
-
+If a recurring task is found together with a finished instance, automatically increment dates:
+- With ⏳ and 📅: both advance by the period from their original dates (no drift).
+- With ⏳ only: next scheduled = finished date + period (drift).
+- With 📅 only: next due = original due + period (no drift).
 If the finished date is not included, infer from the file where the finished task lives (log/YYYY-MM-DD.md).
+
+Example (both ⏳ and 📅):
+- [ ] Task 1 🔁 every 3 days ⏳ 2026-05-14 📅 2026-05-15
+- [x] Task 1 ✅ 2026-05-16
+Next: ⏳ 2026-05-17, 📅 2026-05-18.
+
+Example (⏳ only, drift):
+- [ ] Task 1 🔁 every 3 days ⏳ 2026-05-14
+- [x] Task 1 ✅ 2026-05-15
+Next: ⏳ 2026-05-18.
 
 """
 
@@ -43,7 +50,8 @@ class Task:
     state: str  # " " (todo) or "/" (in progress)
     source: Path  # relative to WORKSPACE_ROOT
     line: int     # line number in the source file
-    scheduled: str | None  # YYYY-MM-DD from ⏳ or 📅, ⏳ wins if both present
+    scheduled: str | None  # YYYY-MM-DD from ⏳
+    due: str | None        # YYYY-MM-DD from 📅
     cron_expr: str | None  # 5-field cron expression if 🔁 was translatable
 
 
@@ -128,6 +136,27 @@ def get_base_body(body: str) -> str:
     return body[:idx].strip()
 
 
+def cron_period_days(cron_expr: str) -> int | None:
+    """Return the fixed day interval for simple patterns, or None for complex ones."""
+    m = re.match(r"every (\d+) days from", cron_expr)
+    if m:
+        return int(m.group(1))
+    if cron_expr == "0 3 * * *":
+        return 1
+    if re.match(r"0 3 \* \* [\d,]+$", cron_expr):
+        return 7
+    return None
+
+
+def _next_cron_after(cron_expr: str, from_date: datetime.date) -> datetime.date:
+    d = from_date + datetime.timedelta(days=1)
+    for _ in range(365 * 5):
+        if cron_matches(cron_expr, d):
+            return d
+        d += datetime.timedelta(days=1)
+    return d
+
+
 def get_finished_date(task: Task) -> datetime.date | None:
     if task.state not in ("x", "X"):
         return None
@@ -174,10 +203,11 @@ def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> l
                 state, body = m.group(1), m.group(2).strip()
                 if state not in (" ", "/", "x", "X") or not body:
                     continue
-                scheduled = extract_date_after(body, SCHED_EMOJI) or extract_date_after(body, DUE_EMOJI)
-                cron_expr = parse_recurrence(body, scheduled)
+                scheduled = extract_date_after(body, SCHED_EMOJI)
+                due = extract_date_after(body, DUE_EMOJI)
+                cron_expr = parse_recurrence(body, scheduled or due)
                 tasks.append(Task(body=body, state=state, source=source_rel, line=line_idx,
-                                  scheduled=scheduled, cron_expr=cron_expr))
+                                  scheduled=scheduled, due=due, cron_expr=cron_expr))
 
     # Post-processing: find latest finished date for each base body
     latest_finished: dict[str, datetime.date] = {}
@@ -193,22 +223,43 @@ def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> l
     for t in tasks:
         if t.state not in ("x", "X") and t.cron_expr:
             base = get_base_body(t.body)
-            if base in latest_finished:
-                fdate = latest_finished[base]
-                next_date = fdate + datetime.timedelta(days=1)
-                for _ in range(365 * 5):
-                    if cron_matches(t.cron_expr, next_date):
-                        break
-                    next_date += datetime.timedelta(days=1)
-                
-                if t.scheduled:
-                    curr_sched = datetime.date.fromisoformat(t.scheduled)
-                    if next_date > curr_sched:
-                        t.scheduled = next_date.isoformat()
-                        t.cron_expr = parse_recurrence(t.body, t.scheduled)
-                else:
-                    t.scheduled = next_date.isoformat()
+            if base not in latest_finished:
+                continue
+            fdate = latest_finished[base]
+            period = cron_period_days(t.cron_expr)
+
+            if t.scheduled and t.due:
+                # Both dates: advance each by the fixed period (no drift)
+                sched_date = datetime.date.fromisoformat(t.scheduled)
+                due_date = datetime.date.fromisoformat(t.due)
+                offset = due_date - sched_date
+                next_sched = (sched_date + datetime.timedelta(days=period)
+                              if period else _next_cron_after(t.cron_expr, sched_date))
+                if next_sched > sched_date:
+                    t.scheduled = next_sched.isoformat()
+                    t.due = (next_sched + offset).isoformat()
                     t.cron_expr = parse_recurrence(t.body, t.scheduled)
+            elif t.scheduled:
+                # Scheduled only: drift from finished date
+                sched_date = datetime.date.fromisoformat(t.scheduled)
+                next_sched = (fdate + datetime.timedelta(days=period)
+                              if period else _next_cron_after(t.cron_expr, fdate))
+                if next_sched > sched_date:
+                    t.scheduled = next_sched.isoformat()
+                    t.cron_expr = parse_recurrence(t.body, t.scheduled)
+            elif t.due:
+                # Due only: advance from original due date (no drift)
+                due_date = datetime.date.fromisoformat(t.due)
+                next_due = (due_date + datetime.timedelta(days=period)
+                            if period else _next_cron_after(t.cron_expr, due_date))
+                if next_due > due_date:
+                    t.due = next_due.isoformat()
+                    t.cron_expr = parse_recurrence(t.body, t.due)
+            else:
+                next_sched = (fdate + datetime.timedelta(days=period)
+                              if period else _next_cron_after(t.cron_expr, fdate))
+                t.scheduled = next_sched.isoformat()
+                t.cron_expr = parse_recurrence(t.body, t.scheduled)
 
     if not include_all:
         tasks = [t for t in tasks if t.state not in ("x", "X")]

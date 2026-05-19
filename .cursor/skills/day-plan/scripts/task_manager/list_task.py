@@ -28,14 +28,15 @@ def format_link(task) -> str:
 def collect_upcoming(tasks, today: datetime.date, window_days: int):
     rows = []
     for t in tasks:
+        ref_str = t.scheduled or t.due
         # If it's a recurring task, project it forward into the window
         if t.cron_expr:
-            if t.scheduled:
-                sched_date = datetime.date.fromisoformat(t.scheduled)
+            if ref_str:
+                sched_date = datetime.date.fromisoformat(ref_str)
                 if sched_date <= today + datetime.timedelta(days=window_days):
                     if (sched_date, t) not in rows:
                         rows.append((sched_date, t))
-                
+
                 # Only project future occurrences if we are not currently overdue
                 if sched_date >= today:
                     for offset in range(window_days + 1):
@@ -49,9 +50,9 @@ def collect_upcoming(tasks, today: datetime.date, window_days: int):
                     if cron_matches(t.cron_expr, date):
                         if (date, t) not in rows:
                             rows.append((date, t))
-        # If it's just a one-off scheduled task
-        elif t.scheduled:
-            sched_date = datetime.date.fromisoformat(t.scheduled)
+        # If it's just a one-off scheduled/due task
+        elif ref_str:
+            sched_date = datetime.date.fromisoformat(ref_str)
             if sched_date <= today + datetime.timedelta(days=window_days):
                 rows.append((sched_date, t))
     rows.sort(key=lambda r: r[0])
