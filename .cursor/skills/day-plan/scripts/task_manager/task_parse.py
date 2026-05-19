@@ -1,0 +1,226 @@
+"""
+Returns all tasks in the workspace notes.
+A task is a line in a markdown file starting with - [ ] or - [/] (inprogress) or - [x] or - [X] (done) followed by a space and the task body.
+Ignores .cursor and .git directories.
+Returns tasks with their source file and line number.
+By default only returns unfinished tasks, use --all to return all tasks..
+
+If an recurring task is found together with a finished instance, automatically increment the next scheduled date.
+
+Example:
+- [ ] Task 1 🔁 every 3 days ⏳ 2026-05-15
+- [x] Task 1 ✅ 2026-05-18
+The next scheduled date for Task 1 will be 2026-05-21.
+
+If the finished date is not included, infer from the file where the finished task lives (log/YYYY-MM-DD.md).
+
+"""
+
+import datetime
+import os
+import re
+from dataclasses import dataclass
+from pathlib import Path
+
+WORKSPACE_ROOT = Path(__file__).resolve().parents[5]
+
+EXCLUDE_DIRS = {".obsidian", ".git", ".cursor"}
+
+TASK_RE = re.compile(r"^\s*- \[([ /xX])\] (.*)$")
+DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
+
+SCHED_EMOJI = "⏳"
+DUE_EMOJI = "📅"
+RECUR_EMOJI = "🔁"
+
+DOW = {"sunday": 0, "monday": 1, "tuesday": 2, "wednesday": 3,
+       "thursday": 4, "friday": 5, "saturday": 6}
+
+
+@dataclass
+class Task:
+    body: str
+    state: str  # " " (todo) or "/" (in progress)
+    source: Path  # relative to WORKSPACE_ROOT
+    line: int     # line number in the source file
+    scheduled: str | None  # YYYY-MM-DD from ⏳ or 📅, ⏳ wins if both present
+    cron_expr: str | None  # 5-field cron expression if 🔁 was translatable
+
+
+def field_matches(field: str, value: int) -> bool:
+    if field == "*":
+        return True
+    for part in field.split(","):
+        if "/" in part:
+            base, step = part.split("/")
+            start = 0 if base == "*" else int(base)
+            if value >= start and (value - start) % int(step) == 0:
+                return True
+        elif "-" in part:
+            lo, hi = map(int, part.split("-"))
+            if lo <= value <= hi:
+                return True
+        elif int(part) == value:
+            return True
+    return False
+
+
+def cron_matches(expr: str, today: datetime.date) -> bool:
+    if expr.startswith("every "):
+        m = re.match(r"every (\d+) days from (\d{4}-\d{2}-\d{2})", expr)
+        if m:
+            interval = int(m.group(1))
+            start_date = datetime.date.fromisoformat(m.group(2))
+            if today >= start_date:
+                return (today - start_date).days % interval == 0
+        return False
+
+    _min, _hour, dom, mon, dow = expr.split()
+    # cron DOW: Sun=0..Sat=6. Python isoweekday: Mon=1..Sun=7.
+    cron_dow = today.isoweekday() % 7
+    return (field_matches(dom, today.day)
+            and field_matches(mon, today.month)
+            and field_matches(dow, cron_dow))
+
+
+def extract_date_after(text: str, emoji: str) -> str | None:
+    idx = text.find(emoji)
+    if idx == -1:
+        return None
+    m = DATE_RE.search(text, idx)
+    return m.group(1) if m else None
+
+
+def parse_recurrence(body: str, scheduled: str | None) -> str | None:
+    idx = body.find(RECUR_EMOJI)
+    if idx == -1:
+        return None
+    tail = body[idx + len(RECUR_EMOJI):].lower().strip()
+    if re.match(r"every day\b", tail):
+        return "0 3 * * *"
+    if re.match(r"every weekday\b", tail):
+        return "0 3 * * 1-5"
+    m = re.match(r"every week(?: on)? ([a-z,]+)", tail)
+    if m:
+        days = [DOW[d.strip()] for d in m.group(1).split(",") if d.strip() in DOW]
+        if days:
+            return f"0 3 * * {','.join(map(str, days))}"
+    if re.match(r"every week\b", tail) and scheduled:
+        cron_dow = datetime.date.fromisoformat(scheduled).isoweekday() % 7
+        return f"0 3 * * {cron_dow}"
+    m = re.match(r"every month(?: on the )?(\d+)(?:st|nd|rd|th)?", tail)
+    if m:
+        return f"0 3 {int(m.group(1))} * *"
+    if re.match(r"every month\b", tail) and scheduled:
+        return f"0 3 {datetime.date.fromisoformat(scheduled).day} * *"
+    m = re.match(r"every (\d+) days\b", tail)
+    if m and scheduled:
+        return f"every {m.group(1)} days from {scheduled}"
+    return None
+
+
+def get_base_body(body: str) -> str:
+    idx = len(body)
+    for emoji in ["⏳", "📅", "🔁", "✅", "➕", "🛫"]:
+        i = body.find(emoji)
+        if i != -1 and i < idx:
+            idx = i
+    return body[:idx].strip()
+
+
+def get_finished_date(task: Task) -> datetime.date | None:
+    if task.state not in ("x", "X"):
+        return None
+    
+    idx = task.body.find("✅")
+    if idx != -1:
+        m = DATE_RE.search(task.body, idx)
+        if m:
+            return datetime.date.fromisoformat(m.group(1))
+    
+    m = DATE_RE.search(task.source.name)
+    if m:
+        return datetime.date.fromisoformat(m.group(1))
+    
+    return None
+
+
+def find_note_files(root: Path = WORKSPACE_ROOT) -> list[Path]:
+    files = []
+    for dirpath, dirnames, filenames in os.walk(str(root)):
+        dirnames[:] = [d for d in dirnames if d not in EXCLUDE_DIRS]
+        for filename in filenames:
+            if filename.endswith(".md"):
+                files.append(Path(dirpath) / filename)
+    return files
+
+
+def parse_all_tasks(root: Path = WORKSPACE_ROOT, include_all: bool = False) -> list[Task]:
+    tasks: list[Task] = []
+    for filepath in find_note_files(root):
+        source_rel = filepath.relative_to(root)
+        with open(filepath, encoding="utf-8") as f:
+            in_code_block = False
+            for line_idx, raw in enumerate(f, start=1):
+                if raw.strip().startswith("```"):
+                    in_code_block = not in_code_block
+                    continue
+                if in_code_block:
+                    continue
+                
+                m = TASK_RE.match(raw)
+                if not m:
+                    continue
+                state, body = m.group(1), m.group(2).strip()
+                if state not in (" ", "/", "x", "X") or not body:
+                    continue
+                scheduled = extract_date_after(body, SCHED_EMOJI) or extract_date_after(body, DUE_EMOJI)
+                cron_expr = parse_recurrence(body, scheduled)
+                tasks.append(Task(body=body, state=state, source=source_rel, line=line_idx,
+                                  scheduled=scheduled, cron_expr=cron_expr))
+
+    # Post-processing: find latest finished date for each base body
+    latest_finished: dict[str, datetime.date] = {}
+    for t in tasks:
+        if t.state in ("x", "X"):
+            base = get_base_body(t.body)
+            fdate = get_finished_date(t)
+            if fdate:
+                if base not in latest_finished or fdate > latest_finished[base]:
+                    latest_finished[base] = fdate
+                    
+    # Update recurring tasks
+    for t in tasks:
+        if t.state not in ("x", "X") and t.cron_expr:
+            base = get_base_body(t.body)
+            if base in latest_finished:
+                fdate = latest_finished[base]
+                next_date = fdate + datetime.timedelta(days=1)
+                for _ in range(365 * 5):
+                    if cron_matches(t.cron_expr, next_date):
+                        break
+                    next_date += datetime.timedelta(days=1)
+                
+                if t.scheduled:
+                    curr_sched = datetime.date.fromisoformat(t.scheduled)
+                    if next_date > curr_sched:
+                        t.scheduled = next_date.isoformat()
+                        t.cron_expr = parse_recurrence(t.body, t.scheduled)
+                else:
+                    t.scheduled = next_date.isoformat()
+                    t.cron_expr = parse_recurrence(t.body, t.scheduled)
+
+    if not include_all:
+        tasks = [t for t in tasks if t.state not in ("x", "X")]
+        
+    return tasks
+
+if __name__ == "__main__":
+    import argparse
+    import sys
+    sys.stdout.reconfigure(encoding="utf-8")
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--all", action="store_true", help="Return all tasks")
+    args = ap.parse_args()
+    for t in parse_all_tasks(include_all=args.all):
+        print(f"{t.source}:{t.line} [{t.state}] {t.body}")

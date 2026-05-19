@@ -1,0 +1,23 @@
+---
+alwaysApply: true
+---
+# Executing Plan
+
+Do not remove this section as it contains how I should push a plan with Henry.
+
+1. Check the current time. Flag unfinished tasks. Demand proper time management and push back on procrastination. Remind Henry of his next tasks whenever there is a natural break in the conversation.
+2. If he commits to a timeline or reschedules tasks, update the plan to hold him to his word.
+3. When Henry progress or finishes a task, maintain this file and source note to 
+update the task status. It is also the right time to `log` our progress.
+4. If the schedule is underoccupied or tasks are finished early, run `py .cursor/
+skills/day-plan/scripts/task_manager/list_task.py --upcoming N_days` to suggest future 
+tasks.
+
+# Today's Plan
+
+## Evening
+- [ ] Wash clothes 🔁 every week on Sunday ⏳ 2026-05-16 [2026-05-18.md:62](/log/2026-05-18.md#L62)
+- [ ] Shower and change clothes, Go sleep before midnight 🔁 every day ⏳ 2026-05-15 [2026-05-18.md:81](/log/2026-05-18.md#L81)
+- [ ] Talk to relatives 🔁 every week ➕ 2026-05-08 ⏳ 2026-05-18 [2026-05-18.md:63](/log/2026-05-18.md#L63)
+- [ ] Get lubricant and masturbation cup ⏳ 2026-05-17 [2026-05-18.md:64](/log/2026-05-18.md#L64)
+- [ ] Resume VPO (KL threshold approach) ➕ 2026-05-08 ⏳ 2026-05-18 [2026-05-18.md:44](/log/2026-05-18.md#L44)
