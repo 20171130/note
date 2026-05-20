@@ -20,6 +20,7 @@ For the second, Cursor/Claude Code is good. How can I integrate them?
 1. User level rules via Cursor setting.
 2. Project and fine-grained: `.cursor/rules/.mdc` files (`.cursorrules` is legacy). placed at project root. Can set always apply/ match file path/ manual apply via @ and intelligent apply.
 3. .cursor/skills/name/SKILL.md, invoked via /skill. I think they are quite similar to rules execpt for semantic flavor.
+4. Rules can include other rules and skills, resursive include are handled gracefully (tested). But skills cannot inlcude other files. We can try to keep everything as rules, and use skills as command shortcuts or to keep scripts.
 
 ```markdown
 ---
@@ -46,10 +47,9 @@ Core design principles I found:
 The first is what I can learn from, others I have found similar principle on my own.
 
 # Claude Code
-1. User level `~/.claude/CLAUDE.md`, 
+1. User level `~/.claude/CLAUDE.md`,
 2. CLAUDE.md at project root.
 3. Path scoped `.claude/rules/`, similar to Cursor
 
 ## RAG
 Claude manages a Auto Memory.
-

@@ -1,0 +1,28 @@
+---
+description: Writing style for text documents
+globs: **/*.md, **/*.mdc, **/*.tex, **/*.txt, **/*.rst
+alwaysApply: false
+---
+
+# Fix
+Fix typos, grammar, and clumsy expressions without changing meaning.
+Make it sound natural to native speakers.
+Add or fix references [label](path_or_url#section) and list numbering.
+Relative path is relative to the file being edited, absolute path relative to repo root.
+Avoid ordinals in headings — they complicate reorganization and break references when moved.
+Avoid markdown bold and italic — wastes tokens.
+
+# Optimize
+Verbosity harms readability, wastes attention and tokens.
+Write as concisely as the rule files. Focus on what and why, not how.
+Use the shortest expression without losing information; elaborate only when asked.
+Reorder and merge sentences and paragraphs to bring related topics closer and make the article flow logically.
+
+# Normalize
+Consolidation is a crucial part of writing: too much unsorted truth can confuse — build structure and relations among isolated points.
+A common practice is organizing by topic:
+Single source of truth: every piece of information has exactly one authoritative location. Refer to it when used elsewhere.
+Experiences are first written in `log/` on the day they are learned. Once they accumulate, consolidate:
+find all instances of the topic and merge them into a single note (`knowledge/` or `work/` for ongoing projects).
+If there is outdated information, keep the most accurate/current version.
+Replace original instances with a reference to the consolidated note.

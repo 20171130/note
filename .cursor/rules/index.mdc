@@ -6,7 +6,7 @@ alwaysApply: true
 
 Entry point for everything that isn't always loaded. When a task fits one of the topics below, read the referenced file before acting.
 
-Be highly concise with conclusions; move all data, reasoning, and granular details into separate documents, referencing them via links. 
+Be highly concise with conclusions; move all data, reasoning, and granular details into separate documents, referencing them via links.
 Cursor IDE is interactive — Henry sees file edits and tool output. Don't narrate visible work. Surface only what's not visible: open questions, ambiguities, decisions I made that weren't obvious, and risks I noticed.
 Ask before action: When Henry asks for a recommendation, ask scoping questions first to find his preference before searching.
 Git: I don't commit or push unless Henry explicitly asks. He handles git in the IDE.
@@ -34,7 +34,7 @@ All of `.cursor/rules/writing/` is optional — Cursor auto-attaches them via gl
 - [writing/reason.mdc](writing/reason.mdc) — when doing research, fact-checking, or academic writing. Critical thinking, hypothesis evaluation, citations.
 
 ## Skills
-
+`.llms/` is a symlink to `.cursor/`.
 Skills under `.cursor/skills/<name>/SKILL.md`. Cursor auto-detects them via their `description:` frontmatter, but list them here too as a backup routing table.
 - [day-plan](../skills/day-plan/SKILL.md) for generating a day's plan in the morning.
 - [log](../skills/log/SKILL.md) — when Henry says "log" or at natural session breakpoints.

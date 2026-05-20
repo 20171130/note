@@ -1,13 +1,14 @@
 # Credit Assignment and Meta-Learning Through Long Term Memory
 
 **
+First I should benchmark existing long term memory carefully, which means reviving Galatea.
 
 A question that I found particularly interesting: Humans have 7 or fewer chunks for their working memory, Turing machines have a single head and finite states, and computers have a few registers and limited stack space. They rely on long term memory/ infinite tape/ RAM and disk. All of these suggest that a large directly accessible memory space is not necessary to achieve generality; memory hierarchy should be introduced for better scalability in terms of both time and space.
 
 1. First benchmark LLMs reasoning/agentic tasks like computer use using full context vs bounded context + long term memory, expect a gap
-    
+
 2. An SFT example can be converted to an example with bounded context, so we can train models for instruction following with bounded memory. However, the gradient flow from future tokens to the past cannot go through long term memory, and there is no learning signal for memory condensation.
-    
+
 3. If there is still a gap, credit assignment through long term memory is needed, which means attributing future reward signals to actions in long term memory. Under a total linear order of time, every future behavior credit-assigns to every past behavior — everything is connected → hard credit assignment, conspiracy theory. The assumption we need is that causality between events is a sparse DAG rather than a total linear order, so credit assignment becomes a matter of parsing linear time into this sparse DAG of causal dependency.
 
 将时间片分割为frame，每个frame的结构是state (summary)+observation-memory retrieval-action-external reward-consoliation (which is used as the next state, as well as for future retrieval, we do not retrieve the whole frame since it will occupy the whole context window) ( in cs, function call frame is called stack frame or Activation Record, both are approporiate here)。每个frame内部value function正常bellman（当然要ppo而不是grpo，grpo难以定义，现实世界是不可重入的），但是最后一个token的未来是被召回时才续上的，用召回它的frame的reward+最终token value来bootstrap。
