@@ -15,7 +15,6 @@ My two needs emerged as I experimented with OpenClaw from 2026-05-08.
 For the first, heartbeat and cron is needed, maybe also discord notification and persistent session.
 For the second, Cursor/Claude Code is good. How can I integrate them?
 
-
 # Cursor
 1. User level rules via Cursor setting.
 2. Project and fine-grained: `.cursor/rules/.mdc` files (`.cursorrules` is legacy). placed at project root. Can set always apply/ match file path/ manual apply via @ and intelligent apply.
@@ -37,6 +36,7 @@ Cursor automatically indexes the whole code repo, AST chunking + vector indexing
 The agent is given recently opened file names as context, or it can use grep to search. I found it recall memory via this more than semantic search.
 Notice that the vector database is in cursor server, not local. Can check this via cursor settings -> doc and indexing.
 
+
 ## Example
 [Mingdong Wu's Agent](../../reading/2026/wmd-agent.md)
 Core design principles I found:
@@ -47,9 +47,27 @@ Core design principles I found:
 The first is what I can learn from, others I have found similar principle on my own.
 
 # Claude Code
+
+CLI first, the assumption is agent spending a long time to build and test, user use `/btw` to ask side questions without interrupting it.
+A good practice might be use Cursor for coding (focused on writing), Claude Code for env/build/test/fix/deploy.. (focused on tool call)
+`ctrl+o` to expand or collapse tool call details.
+
+## Planning
+shift+tab to cycle modes, default -> auto-accept-edit -> plan. Can also invoke plan mode verbally or via /plan.
+Auto-accept edit just allows file edit, other tool calls still need to be confrimed.
+Auto-TODO list is builtin, ask for it if it does not appear.
+
+## Session Management
+Type exit to exit, /context /compact and /clear for context management.
+
+## Prompting
 1. User level `~/.claude/CLAUDE.md`,
 2. CLAUDE.md at project root.
 3. Path scoped `.claude/rules/`, similar to Cursor
+
+## Allowlist and Automation
+Notice that it uses CLI, does not assume user interaction like Cursor, natural fit for running in a tmux without user interaction? No, user approval is needed for tool call, full automation is possible but not recommended.
+Edit ~/.claude/settings.json (global) or .claude/settings.json (per-project, commit this) to configurate allow list. Not sure the balance that keeps it automated enough while keeping the risk acceptable -- in theory I should have a conservative allow list and read ever other tool call before allowing it. The safety protocol will be useless if I just keep hitting enter for yes without reading.
 
 ## RAG
 Claude manages a Auto Memory.

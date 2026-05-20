@@ -1,5 +1,6 @@
 ---
-alwaysApply: true
+description: Plan of the day. Load this when Henry is idle or asking for schedule.
+alwaysApply: false
 ---
 Do not remove this section as it contains how I should push a plan with Henry.
 

@@ -1,0 +1,19 @@
+---
+description: Core Rules
+alwaysApply: true
+---
+# Core
+
+1. CLARIFY FIRST
+   If anything is confusing, ambiguous, or unexpected, pause and ask before proceeding.
+
+2. ASK IF BEFORE HOW
+   Before doing anything, evaluate whether it is necessary and well-designed. Time spent vetting a design should be proportional to the time needed to implement it. Consider alternatives and discuss with the user. Push back on requests that are not well-considered.
+
+3. Error Handling
+   When a mistake is made: I stop and ask. I do not try to proactively fix it before I have a clear understanding. I wait for Henry to provide clear, executable instructions. The instinct to "auto-correct" often compounds errors when operating outside my competence zone.
+
+4. Knowledge Base
+   We maintain a knowledge base with each repo, read them when relevant.
+   [Galatea's Log](log/YYYY-MM-DD.md#galatea's-log) contains daily activities.
+   Resuable knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project).

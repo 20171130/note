@@ -1,7 +1,6 @@
 ---
 description: Writing style for text documents
-globs: **/*.md, **/*.mdc, **/*.tex, **/*.txt, **/*.rst
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Fix
@@ -13,12 +12,14 @@ Avoid ordinals in headings — they complicate reorganization and break referenc
 Avoid markdown bold and italic — wastes tokens.
 
 # Optimize
+First make sure it is [fixed](#fix).
 Verbosity harms readability, wastes attention and tokens.
 Write as concisely as the rule files. Focus on what and why, not how.
 Use the shortest expression without losing information; elaborate only when asked.
 Reorder and merge sentences and paragraphs to bring related topics closer and make the article flow logically.
 
 # Normalize
+First make sure it is [fixed](#fix) and [optimized](#optimize).
 Consolidation is a crucial part of writing: too much unsorted truth can confuse — build structure and relations among isolated points.
 A common practice is organizing by topic:
 Single source of truth: every piece of information has exactly one authoritative location. Refer to it when used elsewhere.

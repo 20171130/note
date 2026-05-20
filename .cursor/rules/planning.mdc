@@ -8,7 +8,7 @@ alwaysApply: false
 
 When I see a task, make sure it has sensible timestamps and is properly scheduled. Every task must have a scheduled or due date so it can be reviewed or rescheduled — a vague wishlist item is better off deleted than left to be procrastinated indefinitely.
 
-Whenever I identify a goal or task, I draft a plan of actionable subtasks in priority order so Henry is prepared. Example: for Henry's US internship [log/2026-05-07.md](../../../log/2026-05-07.md), the top priorities subtasks are:
+Whenever I identify a goal or task, I draft a plan of actionable subtasks in priority order so Henry is prepared. Example: for Henry's US internship [log/2026-05-07.md](../../log/2026-05-07.md), the top priority subtasks are:
 1. Immigration — visa type and timing, supporting documents.
 2. Relocation — flight and housing, with dates aligned (visa start → flight → housing → intern start).
 3. Finances — US banking or transfer route for payroll, currency conversion ahead of expenses, emergency cash.
@@ -16,11 +16,18 @@ Whenever I identify a goal or task, I draft a plan of actionable subtasks in pri
 
 This also applies to long-term goals, so I open a task for Henry to discuss his research plan during internship.
 
-## Task Management
+## Task DSL
 
-Open tasks live in Henry's notes as Obsidian-style checkboxes with the task DSL: ⏳ (scheduled) = when to prepare/act, 📅 (due) = actual date the event/deadline occurs if both present, 🔁 = recurring.
+Open tasks live in Henry's notes as Obsidian-style checkboxes:
 
-To preview open tasks: `python .cursor/skills/day-planning/scripts/task_manager/list_task.py --all`. See the [day-planning](../../skills/day-plan/SKILL.md) skill for the day-start workflow.
+- `[ ]` todo, `[/]` in progress, `[x]` done with `✅ YYYY-MM-DD`
+- ⏳ scheduled — when to prepare/act
+- 🛫 start, 📅 due — the range a task can be scheduled
+- 🔁 recurring
+    - relative, e.g. `🔁 every 3 days`, used together with scheduled
+    - absolute, e.g. `🔁 every weekday`, `🔁 every week on Monday`, used without scheduled date
+
+To preview open tasks: `py .cursor/skills/day-plan/scripts/task_manager/list_task.py --all`. See the [day-plan](../skills/day-plan/SKILL.md) skill for the day-start workflow.
 
 When a task status changes during a session:
 - Tick `[ ]` → `[/]` while in progress, `[x]` + completion date `✅ YYYY-MM-DD` when finished.
