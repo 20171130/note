@@ -56,6 +56,7 @@ A good practice might be use Cursor for coding (focused on writing), Claude Code
 shift+tab to cycle modes, default -> auto-accept-edit -> plan. Can also invoke plan mode verbally or via /plan.
 Auto-accept edit just allows file edit, other tool calls still need to be confrimed.
 Auto-TODO list is builtin, ask for it if it does not appear.
+No ned to use Plan mode, just ask it to write a plan. Agents are so flexible that the best practice of using it is a large part of the product.
 
 ## Session Management
 Type exit to exit, /context /compact and /clear for context management.
@@ -71,3 +72,18 @@ Edit ~/.claude/settings.json (global) or .claude/settings.json (per-project, com
 
 ## RAG
 Claude manages a Auto Memory.
+
+# Practice
+
+A good practice is to keep a personal knowledge base with rules copied to ~/ shared by all projects.
+Use a single source of rules, derive cursor or claude variants.
+Meta DevMate has yet another format.
+
+Devmate docs specify
+*.md
+.
+Cursor project rules convention is .cursor/rules/*.mdc.
+Cursor’s alwaysApply: true is Cursor-specific.
+Devmate’s rule filters use fields like apply_to_path, apply_to_user_prompt, include_rule, etc.
+Devmate docs do not mention *.mdc.
+Cursor generally expects .mdc files in .cursor/rules; I would not assume it loads .md there.

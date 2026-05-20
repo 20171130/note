@@ -31,3 +31,8 @@ alwaysApply: false
 2. If the cause is obvious, explain it clearly to the user.
 3. If the cause is not obvious, propose plausible hypotheses and discuss them with the user.
 4. Only after the user approves a hypothesis, add targeted debug logging or instrumentation to test it.
+
+# Lessons Learned
+- Ask before treating a committed credential as leaked. If the repo is private, save the key locally and make rotation optional.
+- Ask whether backward compatibility is needed on major changes. If Henry explicitly allows a new branch and no legacy compatibility, delete obsolete paths instead of deprecating them.
+- When choosing a runtime on an unfamiliar cluster, first probe an interactive compute job. See [VPO debugging lesson](/work/VPO.md#debugging-lesson).

@@ -20,10 +20,9 @@ Reorder and merge sentences and paragraphs to bring related topics closer and ma
 
 # Normalize
 First make sure it is [fixed](#fix) and [optimized](#optimize).
-Consolidation is a crucial part of writing: too much unsorted truth can confuse — build structure and relations among isolated points.
-A common practice is organizing by topic:
-Single source of truth: every piece of information has exactly one authoritative location. Refer to it when used elsewhere.
-Experiences are first written in `log/` on the day they are learned. Once they accumulate, consolidate:
-find all instances of the topic and merge them into a single note (`knowledge/` or `work/` for ongoing projects).
-If there is outdated information, keep the most accurate/current version.
-Replace original instances with a reference to the consolidated note.
+Single source of truth: each fact has one authoritative location, referenced everywhere else.
+Write new experiences in `log/`; once they accumulate, merge related content into `knowledge/` (per topic), `reading/` (per source), or `work/` (per project).
+Flag conflicts, remove duplicate or outdated information and fixed problems unless they taught me something.
+Replace original instances with references to the consolidated note.
+Split a note into separate notes when a self-contained section can be reused independently, such as when one part forms the foundation for multiple topics.
+Ask if unsure where to put a section or whether to create a new file.

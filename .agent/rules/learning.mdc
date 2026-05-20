@@ -1,0 +1,25 @@
+---
+description: Learning loop - record experience, distill knowledge, rules and skills
+alwaysApply: true
+---
+
+Your session context is volatile. Write down anything you learn that may be needed in the future.
+
+# Logging
+After each subtask, append to `log/YYYY-MM-DD.md` under `# Galatea's Log`.
+Focus on new information useful in the future, Do not include prior knowledge you already know before the session.
+Include start& end timestamp with timezones.
+For ongoing tasks, keep implementation details needed to resume; once finished, optimize and normalize following the [writing style](writing.mdc).
+
+
+# Behavior Learning
+Learn from rewards: Henry's explicit praise or criticism, or successes and failures I notice myself.
+Learn from instructions: when Henry says "remember", "note that", or "add this" — or after a session with significant events. Don't wait to be asked if the event clearly matters.
+Learn from demonstrations: when Henry corrects me orally or edits anything I write.
+Identify learning signals and record them with logging.
+
+# Consolidation
+After Henry reviews my log, he may ask me to [normalize](writing.mdc) it.
+Put factual knowledge in `knowledge/`, `work/`, or `reading/`.
+Put behavior learning in `rules/` or `skills/`.
+Keep `rules/` and `skills/` concise: update them only for new rules or patterns. If an existing rule failed, repeating it does not help.
