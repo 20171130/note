@@ -3,14 +3,24 @@
 
 .agent is the source DSL. Rules are Cursor-compatible .mdc files with
 `description`, Cursor's `alwaysApply`, and the portable `include_rule` list.
-`include_rule` is expanded depth-first for targets that need inlined context.
+Skills are directories under .agent/skills/<name>/ containing SKILL.md (and
+optionally a scripts/ subdirectory). Both rules and skills may carry
+`include_rule`; included non-global rules are inlined depth-first before the
+including body.
 
-Devmate uses ~/.llms/rules/*.md: location is the always-apply signal, so
-`alwaysApply` is omitted and .mdc is converted to .md. Cursor uses
-~/.cursor/rules/*.mdc: `description` and `alwaysApply` are preserved, while
-.agent-only fields such as `include_rule` are stripped. Claude uses one global
-~/.claude/CLAUDE.md plus command files, so rule bodies are consolidated and
-skill bodies become ~/.claude/commands/*.md.
+All outputs are written under a single project root (the `--target` flag,
+defaulting to the parent of the .agent source). Cursor does not support
+user-level file-based rules, so per-project layout is the canonical convention
+for every target:
+
+  <target>/.llms/rules/*.md and <target>/.llms/skills/<name>/   (Devmate;
+      location is the always-apply signal, so `alwaysApply` is omitted and
+      .mdc is converted to .md).
+  <target>/.cursor/rules/*.mdc and <target>/.cursor/skills/<name>/   (Cursor;
+      `description` and `alwaysApply` preserved on rules, .agent-only fields
+      such as `include_rule` stripped).
+  <target>/.claude/CLAUDE.md plus <target>/.claude/commands/*.md   (Claude;
+      rule bodies consolidated into one file, skill bodies become commands).
 """
 
 from __future__ import annotations
@@ -37,24 +47,32 @@ def default_source() -> Path:
     return Path.cwd().resolve()
 
 
+PLATFORMS = ("devmate", "cursor", "claude")
+
+
 @dataclass(frozen=True)
 class Config:
-    home: Path
+    target: Path
     source: Path
     devmate: Path
     cursor: Path
     claude: Path
+    platforms: frozenset[str]
 
     @classmethod
     def from_args(cls, args: argparse.Namespace) -> "Config":
-        home = Path(args.home).expanduser().resolve() if args.home else Path.home().resolve()
         source = Path(args.source).expanduser().resolve() if args.source else default_source()
+        target = Path(args.target).expanduser().resolve() if args.target else source.parent
+        selected = {p for p in PLATFORMS if getattr(args, p)}
+        if args.all or not selected:
+            selected = set(PLATFORMS)
         return cls(
-            home=home,
+            target=target,
             source=source,
-            devmate=home / ".llms",
-            cursor=home / ".cursor",
-            claude=home / ".claude",
+            devmate=target / ".llms",
+            cursor=target / ".cursor",
+            claude=target / ".claude",
+            platforms=frozenset(selected),
         )
 
 
@@ -142,15 +160,6 @@ def atomic_write(path: Path, content: str, dry_run: bool) -> bool:
     return True
 
 
-def copy_file(source: Path, target: Path, dry_run: bool) -> bool:
-    content = read_text(source)
-    return atomic_write(target, content, dry_run)
-
-
-def write_generated(content: str, target: Path, dry_run: bool) -> bool:
-    return atomic_write(target, content, dry_run)
-
-
 def rules(source: Path) -> list[Path]:
     return sorted((source / "rules").glob("*.mdc"))
 
@@ -191,11 +200,47 @@ def devmate_rule_content(path: Path) -> str:
     if "description" in data:
         lines.append(f"description: {data['description']}")
     lines.extend(["---", ""])
-    for part_path, body in expanded_rule_parts(path, set()):
-        if part_path != path:
-            lines.extend([f"# {part_path.stem}", ""])
-        lines.extend([body, ""])
+    bodies = [body for _, body in expanded_rule_parts(path, set())]
+    lines.append("\n\n".join(bodies))
     return "\n".join(lines).rstrip() + "\n"
+
+
+def filter_frontmatter_lines(frontmatter: str, drop_keys: set[str]) -> str:
+    out: list[str] = []
+    drop_active = False
+    for raw_line in frontmatter.splitlines():
+        line = raw_line.rstrip()
+        if not line.strip():
+            drop_active = False
+            out.append(line)
+            continue
+        if line.startswith(" ") and drop_active:
+            continue
+        key, sep, _ = line.partition(":")
+        if sep and not line.startswith(" ") and key.strip() in drop_keys:
+            drop_active = True
+            continue
+        drop_active = False
+        out.append(line)
+    return "\n".join(out).rstrip()
+
+
+def skill_content(skill_path: Path) -> str:
+    frontmatter_src, _ = split_frontmatter(read_text(skill_path))
+    filtered = filter_frontmatter_lines(frontmatter_src, {"include_rule"})
+    bodies = [body for _, body in expanded_rule_parts(skill_path, set())]
+    lines = ["---"]
+    if filtered:
+        lines.append(filtered)
+    lines.extend(["---", ""])
+    lines.append("\n\n".join(bodies))
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def claude_command_content(skill_path: Path) -> str:
+    bodies = [body for _, body in expanded_rule_parts(skill_path, set())]
+    body = "\n\n".join(bodies)
+    return rewrite_skill_links_for_claude(body)
 
 
 def build_claude_rules(rule_files: Iterable[Path]) -> str:
@@ -206,8 +251,7 @@ def build_claude_rules(rule_files: Iterable[Path]) -> str:
         "",
     ]
     for path in rule_files:
-        name = path.stem
-        parts.extend([f"## {name}", ""])
+        parts.extend([f"## {path.stem}", ""])
         for part_path, body in expanded_rule_parts(path, set()):
             if part_path != path:
                 parts.extend([f"### {part_path.stem}", ""])
@@ -220,42 +264,57 @@ def sync(config: Config, dry_run: bool) -> list[str]:
         raise FileNotFoundError(f"source directory does not exist: {config.source}")
 
     changed: list[str] = []
+    do_devmate = "devmate" in config.platforms
+    do_cursor = "cursor" in config.platforms
+    do_claude = "claude" in config.platforms
 
     for rule in rules(config.source):
-        devmate_target = config.devmate / "rules" / f"{rule.stem}.md"
-        cursor_target = config.cursor / "rules" / rule.name
-        if write_generated(devmate_rule_content(rule), devmate_target, dry_run):
-            changed.append(str(devmate_target))
-        if write_generated(cursor_rule_content(rule), cursor_target, dry_run):
-            changed.append(str(cursor_target))
+        if do_devmate:
+            devmate_target = config.devmate / "rules" / f"{rule.stem}.md"
+            if atomic_write(devmate_target, devmate_rule_content(rule), dry_run):
+                changed.append(str(devmate_target))
+        if do_cursor:
+            cursor_target = config.cursor / "rules" / rule.name
+            if atomic_write(cursor_target, cursor_rule_content(rule), dry_run):
+                changed.append(str(cursor_target))
 
-    claude_rules = build_claude_rules(rules(config.source))
-    claude_rule_target = config.claude / "CLAUDE.md"
-    if atomic_write(claude_rule_target, claude_rules, dry_run):
-        changed.append(str(claude_rule_target))
+    if do_claude:
+        claude_rule_target = config.claude / "CLAUDE.md"
+        if atomic_write(claude_rule_target, build_claude_rules(rules(config.source)), dry_run):
+            changed.append(str(claude_rule_target))
 
     for skill_dir in skills(config.source):
         skill_name = skill_dir.name
         source_skill = skill_dir / "SKILL.md"
-        devmate_skill = config.devmate / "skills" / skill_name / "SKILL.md"
-        claude_command = config.claude / "commands" / f"{skill_name}.md"
+        skill_text = skill_content(source_skill) if (do_devmate or do_cursor) else ""
 
-        if copy_file(source_skill, devmate_skill, dry_run):
-            changed.append(str(devmate_skill))
-
-        claude_body = rewrite_skill_links_for_claude(strip_frontmatter(read_text(source_skill)))
-        if atomic_write(claude_command, claude_body, dry_run):
-            changed.append(str(claude_command))
+        if do_devmate:
+            devmate_skill = config.devmate / "skills" / skill_name / "SKILL.md"
+            if atomic_write(devmate_skill, skill_text, dry_run):
+                changed.append(str(devmate_skill))
+        if do_cursor:
+            cursor_skill = config.cursor / "skills" / skill_name / "SKILL.md"
+            if atomic_write(cursor_skill, skill_text, dry_run):
+                changed.append(str(cursor_skill))
+        if do_claude:
+            claude_command = config.claude / "commands" / f"{skill_name}.md"
+            if atomic_write(claude_command, claude_command_content(source_skill), dry_run):
+                changed.append(str(claude_command))
 
         scripts_dir = skill_dir / "scripts"
         if scripts_dir.exists():
-            target_scripts = config.devmate / "skills" / skill_name / "scripts"
-            if tree_fingerprint(scripts_dir) != tree_fingerprint(target_scripts):
-                changed.append(str(target_scripts))
-                if not dry_run:
-                    if target_scripts.exists():
-                        shutil.rmtree(target_scripts)
-                    shutil.copytree(scripts_dir, target_scripts)
+            scripts_targets: list[Path] = []
+            if do_devmate:
+                scripts_targets.append(config.devmate / "skills" / skill_name / "scripts")
+            if do_cursor:
+                scripts_targets.append(config.cursor / "skills" / skill_name / "scripts")
+            for target_scripts in scripts_targets:
+                if tree_fingerprint(scripts_dir) != tree_fingerprint(target_scripts):
+                    changed.append(str(target_scripts))
+                    if not dry_run:
+                        if target_scripts.exists():
+                            shutil.rmtree(target_scripts)
+                        shutil.copytree(scripts_dir, target_scripts)
 
     return changed
 
@@ -277,11 +336,15 @@ def source_fingerprint(source: Path) -> str:
 
 
 def print_config(config: Config) -> None:
-    print(f"home: {config.home}")
+    print(f"target: {config.target}")
     print(f"source: {config.source}")
-    print(f"devmate: {config.devmate}")
-    print(f"cursor: {config.cursor}")
-    print(f"claude: {config.claude}")
+    print(f"platforms: {', '.join(sorted(config.platforms))}")
+    if "devmate" in config.platforms:
+        print(f"devmate: {config.devmate}")
+    if "cursor" in config.platforms:
+        print(f"cursor: {config.cursor}")
+    if "claude" in config.platforms:
+        print(f"claude: {config.claude}")
 
 
 def command_check(config: Config) -> int:
@@ -330,8 +393,12 @@ def command_watch(config: Config, interval: float) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--home", help="Home directory for generated global config; defaults to Path.home().")
-    parser.add_argument("--source", help="Canonical .agent source directory; defaults to ~/note/.agent.")
+    parser.add_argument("--target", help="Output root; user home for Devmate/Claude, project repo for Cursor. Defaults to the parent of the .agent source.")
+    parser.add_argument("--source", help="Canonical .agent source directory; defaults to the .agent ancestor of this script.")
+    parser.add_argument("--devmate", action="store_true", help="Include Devmate output.")
+    parser.add_argument("--cursor", action="store_true", help="Include Cursor output.")
+    parser.add_argument("--claude", action="store_true", help="Include Claude output.")
+    parser.add_argument("--all", action="store_true", help="Include all platforms (default if no platform flag is given).")
     subparsers = parser.add_subparsers(dest="command", required=True)
     subparsers.add_parser("check", help="Preview generated paths without writing.")
     subparsers.add_parser("sync", help="Generate assistant-specific files.")

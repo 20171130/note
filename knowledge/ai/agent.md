@@ -36,6 +36,26 @@ Cursor automatically indexes the whole code repo, AST chunking + vector indexing
 The agent is given recently opened file names as context, or it can use grep to search. I found it recall memory via this more than semantic search.
 Notice that the vector database is in cursor server, not local. Can check this via cursor settings -> doc and indexing.
 
+## Prompt
+Cursor adds prompts like this, partially explaining Galatea felt more inorganic on Cursor then OpenClaw.
+These live in your Cursor user rules and apply every turn:
+
+Git commits — Only commit when you ask; safety protocol (no config changes, no destructive git, no --no-verify, amend rules, parallel status/diff/log, HEREDOC commit messages, no push unless asked).
+
+Pull requests — Use gh for GitHub; parallel prep commands; structured PR body; return PR URL; no TodoWrite/Task for PR flow.
+
+Follow all instructions — User rules, tool rules, system reminders, skills, MCP instructions must be followed completely.
+
+Real environment — Full shell/network access; I must run commands and retry, not give up after one failure.
+
+Communication — Code citations as startLine:endLine:filepath; citation fences on their own line; full URLs/paths; blog-quality prose; proportional responses; sparing bold/backticks; no engagement bait.
+
+Conversation intent — Infer goal from history; mid-task messages are usually steering, not canceling.
+
+Coding principles — Minimize scope; no over-engineering; match existing conventions; comments only when non-obvious; tests only when requested or meaningful.
+
+
+
 
 ## Example
 [Mingdong Wu's Agent](../../reading/2026/wmd-agent.md)
