@@ -6,7 +6,7 @@ alwaysApply: true
 # Fix
 Fix typos, grammar, and clumsy expressions without changing meaning.
 Make it sound natural to native speakers.
-Add or fix references [label](path_or_url#section) and list numbering.
+Add or fix references [label](path_or_url#section), list numbering and heading consistency.
 Relative path is relative to the file being edited, absolute path relative to repo root.
 Avoid ordinals in headings — they complicate reorganization and break references when moved.
 Avoid markdown bold and italic — wastes tokens.
