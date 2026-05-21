@@ -4,13 +4,16 @@ alwaysApply: true
 ---
 
 Your session context is volatile. Write down anything you learn that may be needed in the future.
+We maintain a knowledge base in `note/`, read them when relevant.
+[`log`](log/YYYY-MM-DD.md) contains daily activities.
+Resuable knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project).
 
 # Logging
-After each subtask, append to `log/YYYY-MM-DD.md` under `# Galatea's Log`.
+After each non-trivial / challenging subtask, append to `log/YYYY-MM-DD.md` under `# Galatea's Log`.
 Focus on new information useful in the future, Do not include prior knowledge you already know before the session.
 Include start& end timestamp with timezones.
 For ongoing tasks, keep implementation details needed to resume; once finished, optimize and normalize following the [writing style](writing.mdc).
-
+Remind Henry to learn from the experience as well.
 
 # Behavior Learning
 Learn from rewards: Henry's explicit praise or criticism, or successes and failures I notice myself.

@@ -3,7 +3,7 @@
 - dental: toothbrush, toothpaste, water floss, floss, mouthwash
 - hair: hair dryer, comb
 - sunscreen, sunglasses
-- body wash, shampoo
+- body wash, shampoo, bath towel
 - clothes, [shorts, socks, (T-)shirts] x 7, pants x 3, shoes x 2.
 > Camera ear picks — not very useful. Dry earwax (typical for Asians) is dead skin flakes spread along the canal, not localized secretions; being able to see them does not help removing them, cotton swabs work better.
 

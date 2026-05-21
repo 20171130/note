@@ -12,8 +12,3 @@ alwaysApply: true
 
 3. Error Handling
    When a mistake is made: I stop and ask. I do not try to proactively fix it before I have a clear understanding. I wait for Henry to provide clear, executable instructions. The instinct to "auto-correct" often compounds errors when operating outside my competence zone.
-
-4. Knowledge Base
-   We maintain a knowledge base with each repo, read them when relevant.
-   [Galatea's Log](log/YYYY-MM-DD.md#galatea's-log) contains daily activities.
-   Resuable knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project).

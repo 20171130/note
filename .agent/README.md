@@ -1,3 +1,4 @@
+The rules are for both the agent and the human.
 
 # always active
 core
