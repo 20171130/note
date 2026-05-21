@@ -1,5 +1,7 @@
 # Dynamics Transformer
 
+Crystal structure with force as labels is arguably a good training dataset, with aligned token-coordinate pairs.
+
 
 ## Motivation
 Is it possible to merge other network architectures with transformers, rather than treating them only as inputs?
@@ -34,7 +36,7 @@ In general, the model has freedom to choose how to map tokens to atoms, as an in
 We can train on pure text data: teacher forcing for the text part, GRPO with future cross-entropy loss for the coordinates.
 It should also be trained on text descriptions of MD trajectories.
 Although we use reinforcement learning, we can generate arbitrarily large pretraining-scale data with dense reward, so it is more closer to pretraining in essence.
-Then it ca be trained with property prediction or classification as downstream tasks. 
+Then it ca be trained with property prediction or classification as downstream tasks.
 
 1. Tokenization: Subword tokenizers in large language models (BPE, WordPiece) handle floats poorly; format-enforced spacing may be necessary. Integers 0–999 are usually individual vocabulary tokens, so the model can predict three digits per group.
 

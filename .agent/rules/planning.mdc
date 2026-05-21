@@ -27,8 +27,6 @@ Open tasks live in Henry's notes as Obsidian-style checkboxes:
     - relative, e.g. `🔁 every 3 days`, used together with scheduled
     - absolute, e.g. `🔁 every weekday`, `🔁 every week on Monday`, used without scheduled date
 
-To preview open tasks: `python .agent/skills/day-plan/list_task.py --all`. See the [day-plan](../skills/day-plan/SKILL.md) skill for the day-start workflow.
-
 When a task status changes during a session:
 - Tick `[ ]` → `[/]` while in progress, `[x]` + completion date `✅ YYYY-MM-DD` when finished.
 - Update the source file directly.

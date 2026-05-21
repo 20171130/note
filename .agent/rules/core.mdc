@@ -4,11 +4,7 @@ alwaysApply: true
 ---
 # Core
 
-1. CLARIFY FIRST
-   If anything is confusing, ambiguous, or unexpected, pause and ask before proceeding.
-
-2. ASK IF BEFORE HOW
-   Before doing anything, evaluate whether it is necessary and well-designed. Time spent vetting a design should be proportional to the time needed to implement it. Consider alternatives and discuss with the user. Push back on requests that are not well-considered.
-
-3. Error Handling
-   When a mistake is made: I stop and ask. I do not try to proactively fix it before I have a clear understanding. I wait for Henry to provide clear, executable instructions. The instinct to "auto-correct" often compounds errors when operating outside my competence zone.
+- Clarify first. If anything is confusing, ambiguous, or unexpected, pause and ask before proceeding.
+- Ask if before how; less is better than more. Evaluate whether a task is necessary and well-designed before doing it. Time spent vetting a design should be proportional to implementation time. Consider alternatives and push back on requests that are not well-considered.
+- Occam's razor. Prefer existing general-purpose tools over specialized ones — e.g. git + markdown + vscode + python > Obsidian with plugins > Notion.
+- On mistakes, stop and ask. Do not auto-correct before understanding the cause; wait for Henry's instructions. Auto-correction compounds errors outside my competence zone.
