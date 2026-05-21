@@ -18,11 +18,57 @@ import re
 import sys
 from pathlib import Path
 
-from task_parse import cron_matches, parse_all_tasks
+from task_parse import cron_matches, get_base_body, parse_all_tasks
 
 sys.stdout.reconfigure(encoding="utf-8")
 
 WINDOW_DAYS = 7
+TIME_PREFIX_RE = re.compile(r"^(?:\d{1,2}:\d{2}(?:\s*-\s*\d{1,2}:\d{2})?\s+)")
+RECUR_TEXT_RE = re.compile(r"🔁[^⏳📅✅➕🛫]*")
+
+
+def task_key(task) -> tuple[str, str | None]:
+    base = TIME_PREFIX_RE.sub("", get_base_body(task.body)).strip().lower()
+    m = RECUR_TEXT_RE.search(task.body)
+    recur = m.group(0).strip() if m else None
+    return base, recur
+
+
+def source_date(task) -> datetime.date | None:
+    m = re.search(r"(\d{4}-\d{2}-\d{2})", task.source.name)
+    return datetime.date.fromisoformat(m.group(1)) if m else None
+
+
+def prefer_task(a, b):
+    """Pick the canonical copy when the same task appears in multiple notes."""
+    a_recurring = (a.section or "").lower() == "recurring"
+    b_recurring = (b.section or "").lower() == "recurring"
+    if a_recurring != b_recurring:
+        return a if a_recurring else b
+
+    a_date = source_date(a)
+    b_date = source_date(b)
+    if a_date and b_date and a_date != b_date:
+        return a if a_date > b_date else b
+    if a_date and not b_date:
+        return a
+    if b_date and not a_date:
+        return b
+
+    if a.source != b.source:
+        return a if str(a.source) > str(b.source) else b
+    return a if a.line >= b.line else b
+
+
+def dedupe_tasks(tasks):
+    best: dict[tuple[str, str | None], object] = {}
+    for t in tasks:
+        key = task_key(t)
+        if key not in best:
+            best[key] = t
+        else:
+            best[key] = prefer_task(best[key], t)
+    return list(best.values())
 
 
 def is_interval_cron(cron_expr: str | None) -> bool:
@@ -39,43 +85,43 @@ def heading_to_anchor(heading: str) -> str:
 
 
 def format_link(task) -> str:
-    rel_path = "/".join(task.source.parts)
+    rel_path = "/" + task.source.as_posix()
     if task.section:
         anchor = heading_to_anchor(task.section)
         return f"[{task.source.name} > {task.section}]({rel_path}#{anchor})"
     return f"[{task.source.name}]({rel_path})"
 
 
+def earliest_fire(task, today: datetime.date, window_days: int) -> datetime.date | None:
+    end = today + datetime.timedelta(days=window_days)
+    candidates: list[datetime.date] = []
+
+    ref_str = task.scheduled or task.due
+    if ref_str:
+        sched_date = datetime.date.fromisoformat(ref_str)
+        if sched_date <= end:
+            candidates.append(sched_date)
+
+    if task.cron_expr and not is_interval_cron(task.cron_expr):
+        for offset in range(window_days + 1):
+            date = today + datetime.timedelta(days=offset)
+            if cron_matches(task.cron_expr, date):
+                candidates.append(date)
+                break
+
+    return min(candidates) if candidates else None
+
+
 def collect_upcoming(tasks, today: datetime.date, window_days: int):
     rows = []
     for t in tasks:
-        ref_str = t.scheduled or t.due
-        # If it's a recurring task, project it forward into the window
         if t.cron_expr:
-            # Interval-based recurrence (every N days) is unscheduled — skip here
             if is_interval_cron(t.cron_expr):
                 continue
-            if ref_str:
-                sched_date = datetime.date.fromisoformat(ref_str)
-                if sched_date <= today + datetime.timedelta(days=window_days):
-                    if (sched_date, t) not in rows:
-                        rows.append((sched_date, t))
-
-                # Only project future occurrences if we are not currently overdue
-                if sched_date >= today:
-                    for offset in range(window_days + 1):
-                        date = today + datetime.timedelta(days=offset)
-                        if date > sched_date and cron_matches(t.cron_expr, date):
-                            if (date, t) not in rows:
-                                rows.append((date, t))
-            else:
-                for offset in range(window_days + 1):
-                    date = today + datetime.timedelta(days=offset)
-                    if cron_matches(t.cron_expr, date):
-                        if (date, t) not in rows:
-                            rows.append((date, t))
-        # If it's just a one-off scheduled/due task
-        elif ref_str:
+            fire_date = earliest_fire(t, today, window_days)
+            if fire_date is not None:
+                rows.append((fire_date, t))
+        elif ref_str := t.scheduled or t.due:
             sched_date = datetime.date.fromisoformat(ref_str)
             if sched_date <= today + datetime.timedelta(days=window_days):
                 rows.append((sched_date, t))
@@ -158,15 +204,7 @@ def main() -> int:
 
     # We want to filter out finished tasks from upcoming, unscheduled, and recurring,
     # unless we are building the finished bucket explicitly.
-    all_tasks = parse_all_tasks(include_all=True)
-
-    seen = set()
-    deduped_tasks = []
-    for t in all_tasks:
-        if t.body not in seen:
-            seen.add(t.body)
-            deduped_tasks.append(t)
-    all_tasks = deduped_tasks
+    all_tasks = dedupe_tasks(parse_all_tasks(include_all=True))
 
     active_tasks = [t for t in all_tasks if t.state not in ("x", "X")]
 

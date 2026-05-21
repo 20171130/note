@@ -23,9 +23,9 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-WORKSPACE_ROOT = Path(__file__).resolve().parents[5]
+WORKSPACE_ROOT = Path(__file__).resolve().parents[3]
 
-EXCLUDE_DIRS = {".obsidian", ".git", ".cursor"}
+EXCLUDE_DIRS = {".obsidian", ".git", ".cursor", ".agent"}
 
 TASK_RE = re.compile(r"^\s*- \[([ /xX])\] (.*)$")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")

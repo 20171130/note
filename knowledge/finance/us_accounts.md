@@ -2,6 +2,8 @@
 
 *Related: [account_allocation](account_allocation.md) - overall strategy for savings, FX, and investing.*
 
+Use my paystab or confirmation for proof of address.
+
 Week 1-2 (after arrival)
   → Apply for SSN at SSA office (after 10+ business days in US)
 

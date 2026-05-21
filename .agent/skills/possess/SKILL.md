@@ -32,7 +32,7 @@ Derived targets:
 - OpenClaw: not supported yet
 
 It works on both windows and *nix.
-Skill `scripts/` subdirectories are copied alongside the SKILL.md for Devmate and Cursor.
+Skill `scripts/` subdirectories and sibling `*.py` files are copied alongside the SKILL.md for Devmate and Cursor.
 
 # .agent rule DSL
 

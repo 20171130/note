@@ -7,7 +7,7 @@ description: Help Henry drafting his day plan as `todo.mdc` in the morning.
 
 Start the day by discussing Henry's plan. Schedule open tasks into available time slots using the [Task DSL](../../rules/plan.mdc#task-dsl). Send an intuitive list of due and available tasks.
 
-1. Run `py .cursor/skills/day-plan/scripts/task_manager/list_task.py` to see unscheduled and upcoming tasks.
+1. Run `python .agent/skills/day-plan/list_task.py` to see unscheduled and upcoming tasks.
 2. Flag unscheduled tasks — every task needs a date. Ask Henry to find a date for it.
 3. Reschedule overdue tasks for today, without changing the due date.
 4. Update `.cursor/rules/todo.mdc` with today's plan, grouped by time slots (morning, afternoon, evening). Omit list ordinals, since Henry will reorder to confirm his priorities.

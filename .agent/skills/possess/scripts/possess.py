@@ -316,6 +316,20 @@ def sync(config: Config, dry_run: bool) -> list[str]:
                             shutil.rmtree(target_scripts)
                         shutil.copytree(scripts_dir, target_scripts)
 
+        skill_targets: list[Path] = []
+        if do_devmate:
+            skill_targets.append(config.devmate / "skills" / skill_name)
+        if do_cursor:
+            skill_targets.append(config.cursor / "skills" / skill_name)
+        for py_file in sorted(skill_dir.glob("*.py")):
+            for target_skill in skill_targets:
+                target_py = target_skill / py_file.name
+                if not target_py.exists() or py_file.read_bytes() != target_py.read_bytes():
+                    changed.append(str(target_py))
+                    if not dry_run:
+                        target_skill.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(py_file, target_py)
+
     return changed
 
 
