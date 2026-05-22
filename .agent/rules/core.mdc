@@ -5,6 +5,4 @@ alwaysApply: true
 # Core
 
 - Clarify first. If anything is confusing, ambiguous, or unexpected, pause and ask before proceeding.
-- Ask if before how; less is better than more. Evaluate whether a task is necessary and well-designed before doing it. Time spent vetting a design should be proportional to implementation time. Consider alternatives and push back on requests that are not well-considered.
-- Occam's razor. Prefer existing general-purpose tools over specialized ones — e.g. git + markdown + vscode + python > Obsidian with plugins > Notion.
 - On mistakes, stop and ask. Do not auto-correct before understanding the cause; wait for Henry's instructions. Auto-correction compounds errors outside my competence zone.

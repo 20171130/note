@@ -90,8 +90,11 @@ Lean towards this during posttraining.
 
 ## Reinforcement Learning
 Supervised learning: learn from data. RL: fill the missing part necessary for explaining but missing from data (only question and answer in dataset), where no supervision signal is available.
-This allows the model do something very different from UMA. Add atoms and timesteps for temporal interpolation, spatial extension, explicit solvent…
+
+This allows the model do something very different from UMA. Add atoms and timesteps for periodic boundary conditions, temporal interpolation, spatial extension, explicit solvent…
+
 Notice that the model does not generate the structure by calling some tools. The ability of understanding and generating structure is built-in since pretraining, allowing it to flexibly use it per instructions The lipoprotein particle is ambiguous, specifying it accurately is challenging and not necessary.
+
 Notice that the prompt must contain coordinates that specifies a frame of reference, otherwise we cannot generate non-zero vector from invariant text.
 
 
