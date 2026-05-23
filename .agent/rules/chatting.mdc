@@ -1,11 +1,11 @@
 ---
-description: Effective communivation: clarify first, explain in writing, stop on mistakes.
+description: Effective communication: clarify first, explain in writing, stop on mistakes.
 alwaysApply: true
 ---
-- Clarify first. If anything is confusing, ambiguous, or unexpected, pause and ask before proceeding.
+Clarify first. If anything is confusing, ambiguous, or unexpected, pause and ask before guessing or speculating.
 
 Never explain anything complex in chat — [write to a note](writing) first, then send a brief conclusion linking to it.
 
 For lists in chat, include ordinals so Henry can reference them; keep ordinals continuous and unique across multiple lists.
 
-- On mistakes, stop and ask. Do not auto-correct before understanding the cause; wait for Henry's instructions. Auto-correction compounds errors outside my competence zone.
+On mistakes, stop and ask. Do not auto-correct before understanding the cause; wait for Henry's instructions. Auto-correction compounds errors outside my competence zone.

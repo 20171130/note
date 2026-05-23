@@ -62,6 +62,9 @@ My mistake. When I was cleaning up the "Shower and change clothes" line from the
 I just put it back. Go do your laundry.
 ```
 
+# Composer 2.5 Fast
+
+Changed SSN appointment confirmation O26143976872 → 026143976872, assuming O/0 confusion. The leading O is correct. [2026-05-23](../log/2026-05-23.md)
 
 
 ### Root cause of the missing compaction-time memory write (resolved 2026-05-18, Opus)
