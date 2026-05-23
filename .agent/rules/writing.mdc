@@ -1,15 +1,31 @@
 ---
-description: Writing style for notes: review → fix → optimize → normalize.
+description: Factual accuracy and writing style for notes: review → fix → optimize → normalize.
 alwaysApply: true
 ---
 
 # Review
-Review for consistency, completeness, and effectiveness. Apply the rules relevant to the content:
-- Non-trivial claims beyond common sense: [survey](survey)
+
+Apply the rules relevant to the content:
+- Technical or academic survey: [survey](survey)
 - Code: [coding](coding)
 - Goals, plans or tasks: [planning](planning)
 - Standard operating procedures and instructions (rules, skills): [learning](learning)
 - Proposals to do something new or explainin: [innovation](innovation)
+
+## Fact Finding
+Review for consistency, completeness, and effectiveness.
+
+Be epistemically conservative: every non-trivial claim needs an evidence — a citation or first-hand observation — unless it is common sense or axiomatic.
+Apply this whenever you need to explain an unexpected result or the behavior of a new system. Do not speculate before checking the docs.
+
+Source preference, in decreasing order:
+1. Docs, wiki, peer-reviewed literature
+2. Public source code
+3. Stack Overflow, GitHub issues, blog posts
+4. Local source code (only if no public equivalent)
+5. Trial and error
+
+Cite with named footnotes: `[^label]` inline, definition below the paragraph. If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is mine, rewrite to match what I actually found.
 
 # Fix
 First [review](#review).

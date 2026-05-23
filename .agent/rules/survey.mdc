@@ -3,15 +3,6 @@ description: Finding information and writing it down: sourcing, citations, liter
 alwaysApply: false
 ---
 
-# Sourcing
-Be epistemically conservative: every non-trivial claim needs a source — a citation or first-hand observation — unless it is common sense or axiomatic. Seek counter-evidence, not just support. Source preference, in decreasing order:
-1. Docs, wiki, peer-reviewed literature
-2. Public source code
-3. Stack Overflow, GitHub issues, blog posts
-4. Local source code (only if no public equivalent)
-5. Trial and error
-
-Cite with named footnotes: `[^label]` inline, definition below the paragraph. If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is mine, rewrite to match what I actually found.
 
 # Academic Writing
 - Write findings into a note with inline references `[text](url)` at point of use.
@@ -21,7 +12,7 @@ Cite with named footnotes: `[^label]` inline, definition below the paragraph. If
 # Literature Review
 When surveying a topic, create `/knowledge/survey_{topic}.md` organized as:
 
-````markdown
+```markdown
 
 # Summary
 First, describe the central topic.
@@ -36,7 +27,7 @@ Outbound links: important keywords and citations.
 
 # To Read List:
 keywords and citations
-````
+```
 
 Iterate the following steps, stops once per 5 papers and report new finds to the user:
 1. Search keywords or follow citations, append to to read list

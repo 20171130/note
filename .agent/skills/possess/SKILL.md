@@ -1,6 +1,6 @@
 ---
 name: possess
-description: Sync canonical .agent customizations into Devmate, Claude, and Cursor formats.
+description: Sync canonical `note/.agent/` rules and skills into Devmate, Claude, and Cursor
 ---
 
 # Possess
@@ -21,8 +21,6 @@ python3 skills/possess/scripts/possess.py  --target <target> check
 ```
 
 Use --devmate, --claude, --cursor or --all to specify application(s) to possess.
-For Devmate and Claude, target should be user home.
-Cursor does not support user level rules (which in configurated via Cursor IDE GUI), so need to target each project repo separately.
 
 Derived targets:
 
@@ -33,6 +31,15 @@ Derived targets:
 
 It works on both windows and *nix.
 Skill `scripts/` subdirectories and sibling `*.py` files are copied alongside the SKILL.md for Devmate and Cursor.
+
+
+# Different Specifications
+For Devmate and Claude, target should be user home.
+Cursor does not support user level rules (which in configurated via Cursor IDE GUI), so need to target each project repo separately.
+
+Devmate does not support applying rules conditonally via glob matching (https://www.internalfb.com/wiki/Devmate/Devmate_Skills), unless via include_rule frontmatter of skills or other rules.
+Therefore, conditional rules shoule be converted to skills for Devmate.
+
 
 # .agent rule DSL
 

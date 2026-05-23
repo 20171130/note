@@ -1,7 +1,7 @@
 The rules are for both the agent and the human.
 
 # Basic
-Communication
+Chatting
 Writing (review, fix, optimize, normalize)
 Learning
 
