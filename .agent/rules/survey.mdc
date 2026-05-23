@@ -16,6 +16,8 @@ When surveying a topic, create `/knowledge/survey_{topic}.md` organized as:
 
 # Summary
 First, describe the central topic.
+Describe milestone breakthroughs and paradigm shifts, trends and current focus of work.
+Distinguish established best practice (or competing popular paradigms), emerging practice (solid results, not yet widely adopted), and questionable one-offs (weak results, or strong claims with no follow-up years after publication).
 
 
 # Read List
@@ -25,11 +27,14 @@ Title
 Summary (may refer to other items); link to its reading note in `reading/` if one exists.
 Outbound links: important keywords and citations.
 
-# To Read List:
+# To Read List
 keywords and citations
 ```
 
-Iterate the following steps, stops once per 5 papers and report new finds to the user:
-1. Search keywords or follow citations, append to to read list
-2. Pick the most promising one in to read list, read it and create a section for it
-3. remove the original one from to read list, Update the to read list with its outbound links
+Iterate the following steps:
+1. Search keywords or follow citations; append to the To Read list.
+2. Pick the most promising entry, read it, and add a section for it.
+3. Update the summary; pause every 3–5 papers to report new finds and let the user adjust direction.
+4. Remove the entry from the To Read list and append its outbound links.
+
+> PDFs: use `python -c "from pypdf import PdfReader; ..."` to extract text. Fall back to ar5iv HTML (https://ar5iv.labs.arxiv.org/html/<id>) only if the PDF is scanned (no embedded text) or precise math/figure layout matters.
