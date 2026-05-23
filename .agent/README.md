@@ -1,16 +1,16 @@
 The rules are for both the agent and the human.
 
-# always active
-core
-user
-chatting
-[writing style](rules/style.mdc): `/fix` `/optimize` and `/normalize`
-learning: `/learn` from the session
+# Basic
+Communication
+Writing (review, fix, optimize, normalize)
+Learning
 
-# conditional
-reasoning
-coding
+# Advanced or Specific
+> All refered in [writing](rules/writing.mdc)
+Survey
+Innovation
+Planning
+Coding
 
 # Skills
 `/possess` for Galatea possessing Cursor/ClaudeCode/Meta Devamate, possibly OpenClaw in the future.
-`/day-plan`

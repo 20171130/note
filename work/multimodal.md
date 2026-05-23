@@ -1,15 +1,7 @@
 # TODO
 Think more carefully about architecture, training data, and evaluation tasks.
 
-Thank you for listening and for the feedback. I think the first question to ask is: what is the minimum prior a transformer needs in order to understand 3D point clouds? A spectrum could be:
-1. Proper tokenization of floats
-2. Proper embedding of floats
-3. Invariance (separating direction and distance, RBFs…)
-4. Equivariant representation (irreps, e3nn…)
-
 Brandon: How to fight catastrophic forgetting? Perhaps make it closer to vanilla transformer so I can use LoRA?
-
-How to deal with PBC?
 
 Besides architecture, another problem is data, and it's a huge problem.
 
@@ -27,13 +19,12 @@ Not a replacement for UMA — a complementary multitask, in-context learner.
 
 First class citizen: not as text, vision or tool calls, chemistry deserves its own proper representation. LLMs can summarize a paragraph, it should be able to create coarse grain model of a system. Reason in words, now it can reason in atoms as well. Mirroring the microscopic atomic world; analogous to ideas like "visual thinking", "spatial memory", "sixth sense".
 
-Architecture
+# Architecture
 Each token can be either a text token, a real number, or a vector.
 
 Like text transformers: causal attention mask, parallel training, autoregressive generation.
 
 Like geometric models: localized interaction, equivariance, tensor product, radial basis functions.
-
 
 For pure text input, the equivariant message passing is noop.
 
@@ -41,7 +32,21 @@ Parameterization compatible with the vanilla transformer — initialized from pr
 
 For decoding, reserve a special `<|vectortoken|>`, if that is sampled, sample from a 3D Gaussian distribution instead.
 
-# Architecture
+I would argue a likelihood based distribution loss is better than regression loss, so both text and vector prediction are measured in bits of entropy.
+
+
+I think the first question to ask is: what is the minimum prior a transformer needs in order to understand 3D point clouds? A spectrum could be:
+1. Proper tokenization of floats
+2. Proper embedding of floats
+3. Invariance (separating direction and distance, RBFs…)
+4. Equivariant representation (irreps, e3nn…)
+
+on prior needed for transformers to understand chemistry [](/reading/2025/molecule_transformer_without_graph.md)
+Interesting that their conclusion is no prior is needed, except for continous representation.
+So there conclusion is 2.
+However, they use GPT style pretraining + BERT style finetuning, using two different tokenization strateigies and sacrificing the ability of generative modeling.
+This paper is a very good baseline and point to start with.
+
 
 # Pretraining
 The idea is simple. The key is scaling.

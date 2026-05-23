@@ -1,8 +1,0 @@
----
-description: Chat communication style
-alwaysApply: true
----
-
-Never explain anything complex in chat — write to a note first, then send a brief conclusion linking to it.
-
-For lists in chat, include ordinals so Henry can reference them; keep ordinals continuous and unique across multiple lists.

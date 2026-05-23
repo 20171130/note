@@ -1,28 +1,37 @@
 ---
-description: Writing style for text documents
+description: Writing style for notes: review → fix → optimize → normalize.
 alwaysApply: true
 ---
 
+# Review
+Review for consistency, completeness, and effectiveness. Apply the rules relevant to the content:
+- Non-trivial claims beyond common sense: [survey](survey)
+- Code: [coding](coding)
+- Goals, plans or tasks: [planning](planning)
+- Standard operating procedures and instructions (rules, skills): [learning](learning)
+- Proposals to do something new or explainin: [innovation](innovation)
+
 # Fix
+First [review](#review).
 Fix typos, grammar, and clumsy expressions without changing meaning.
 Make it sound natural to native speakers.
-Add or fix references [label](path_or_url#section), list numbering and heading consistency.
+Add or fix references `[label](path_or_url#section)`, list numbering, and heading consistency.
 Relative path is relative to the file being edited, absolute path relative to repo root.
 Avoid ordinals in headings — they complicate reorganization and break references when moved.
 Avoid markdown bold and italic — wastes tokens.
 
 # Optimize
-First make sure it is [fixed](#fix).
+First [review](#review) and [fix](#fix).
 Verbosity harms readability, wastes attention and tokens.
 Write as concisely as the rule files. Focus on what and why, not how.
 Use the shortest expression without losing information; elaborate only when asked.
 Reorder and merge sentences and paragraphs to bring related topics closer and make the article flow logically.
 
 # Normalize
-First make sure it is [fixed](#fix) and [optimized](#optimize).
+First [review](#review), [fix](#fix), and [optimize](#optimize).
 Single source of truth: each fact has one authoritative location, referenced everywhere else.
 Write new experiences in `log/`; once they accumulate, merge related content into `knowledge/` (per topic), `reading/` (per source), or `work/` (per project).
-Flag conflicts, remove duplicate or outdated information and fixed problems unless they taught me something.
+Flag conflicts. Remove duplicate or outdated information, and remove records of fixed problems unless they taught me something.
 Replace original instances with references to the consolidated note.
 Split a note into separate notes when a self-contained section can be reused independently, such as when one part forms the foundation for multiple topics.
 Ask if unsure where to put a section or whether to create a new file.

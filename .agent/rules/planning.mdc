@@ -1,5 +1,5 @@
 ---
-description: Task management and planning — every task has ⏳ scheduled or 📅 due date, 🔁 recurring; status `[ ]`/`[/]`/`[x]` with `✅ YYYY-MM-DD` completion. Draft subtasks in priority order. Load when reading or editing notes/logs that contain tasks.
+description: Task DSL and planning: schedule every task; draft subtasks in priority order.
 globs: **/*.md
 alwaysApply: false
 ---

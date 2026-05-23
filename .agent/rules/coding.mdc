@@ -1,5 +1,5 @@
 ---
-description: Coding principles — minimize code, no docs/error handling unless asked, let it crash, root-cause first when debugging. Load when editing any source file.
+description: Code style and debugging: minimize code, no docs or error handling unless asked, let it crash, root-cause first.
 globs: **/*.py, **/*.ts, **/*.tsx, **/*.js, **/*.jsx, **/*.go, **/*.rs, **/*.c, **/*.cc, **/*.cpp, **/*.h, **/*.hpp, **/*.java, **/*.sh, **/*.ps1, **/*.rb, **/*.lua, **/*.zig, **/*.swift, **/*.kt, **/*.scala
 alwaysApply: false
 ---

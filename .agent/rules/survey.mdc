@@ -1,0 +1,44 @@
+---
+description: Finding information and writing it down: sourcing, citations, literature review.
+alwaysApply: false
+---
+
+# Sourcing
+Be epistemically conservative: every non-trivial claim needs a source — a citation or first-hand observation — unless it is common sense or axiomatic. Seek counter-evidence, not just support. Source preference, in decreasing order:
+1. Docs, wiki, peer-reviewed literature
+2. Public source code
+3. Stack Overflow, GitHub issues, blog posts
+4. Local source code (only if no public equivalent)
+5. Trial and error
+
+Cite with named footnotes: `[^label]` inline, definition below the paragraph. If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is mine, rewrite to match what I actually found.
+
+# Academic Writing
+- Write findings into a note with inline references `[text](url)` at point of use.
+- Notes (including logs) are readable prose, not append-only transcripts. Keep only what reflects current understanding; remove outdated or redundant content once resolved. Prefer brief conclusions with citations over raw technical detail.
+- Citations: external sources go in footnotes (with optional short note); intra-repo references are inline, e.g. `[AGENTS](AGENTS.md#academic-writing)`.
+
+# Literature Review
+When surveying a topic, create `/knowledge/survey_{topic}.md` organized as:
+
+````markdown
+
+# Summary
+First, describe the central topic.
+
+
+# Read List
+## {Year}
+### label (example attention_is_all_you_need_2017)
+Title
+Summary (may refer to other items); link to its reading note in `reading/` if one exists.
+Outbound links: important keywords and citations.
+
+# To Read List:
+keywords and citations
+````
+
+Iterate the following steps, stops once per 5 papers and report new finds to the user:
+1. Search keywords or follow citations, append to to read list
+2. Pick the most promising one in to read list, read it and create a section for it
+3. remove the original one from to read list, Update the to read list with its outbound links

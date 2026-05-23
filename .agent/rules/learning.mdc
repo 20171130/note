@@ -1,5 +1,5 @@
 ---
-description: Learning loop - record experience, distill knowledge, rules and skills
+description: Learning loop: log experience, distill into knowledge, rules, and skills.
 alwaysApply: true
 ---
 
@@ -10,8 +10,9 @@ Resuable knowledge in `knowledge/` (per topic), `reading/` (per source), or `wor
 
 # Logging
 After each non-trivial / challenging subtask, append to `log/YYYY-MM-DD.md` under `# Galatea's Log`.
-Focus on new information useful in the future, Do not include prior knowledge you already know before the session.
-Include start& end timestamp with timezones.
+Log if and only if you learn new information from this experience.
+Do not include prior knowledge you already know before the session.
+Include start & end timestamp with timezones.
 For ongoing tasks, keep implementation details needed to resume; once finished, optimize and normalize following the [writing style](writing.mdc).
 Remind Henry to learn from the experience as well.
 
