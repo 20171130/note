@@ -24,7 +24,7 @@ Distinguish established best practice (or competing popular paradigms), emerging
 ## {Year}
 ### label (example attention_is_all_you_need_2017)
 Title
-Summary (may refer to other items); link to its reading note in `reading/` if one exists.
+Summary (may refer to other items); if there is already a reading note `reading/`, normalize and only keep link.
 Outbound links: important keywords and citations.
 
 # To Read List
