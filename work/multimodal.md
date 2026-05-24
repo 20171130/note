@@ -1,11 +1,18 @@
 # TODO
 Think more carefully about architecture, training data, and evaluation tasks.
 
-Brandon: How to fight catastrophic forgetting? Perhaps make it closer to vanilla transformer so I can use LoRA?
-
+Brandon:
+1. How to fight catastrophic forgetting? Perhaps make it closer to vanilla transformer so I can use LoRA?
+2. How to deal with PBC? I think probably manual data augmentation by creating mirror cells, or chain of thought doing this automatically.
 Besides architecture, another problem is data, and it's a huge problem.
 
 Also on evaluation, what task is optimal for demonstrating our motivation? The best task may be something with little data so few/zero shot generalization is preferred, or some tasks that involve inherent ambiguity in its specification so the flexibility of text is needed.
+
+# History
+Originally I designed a transformer for MD trajectories.
+Zack suggested it should be applicable to all atomic, or even macroscopic, point clouds.
+Then I changed it to a generative equivariant transformer.
+Brandon and Ray suggested we can drop equivariance entirely.
 
 # Motivation
 
@@ -20,32 +27,26 @@ Not a replacement for UMA — a complementary multitask, in-context learner.
 First class citizen: not as text, vision or tool calls, chemistry deserves its own proper representation. LLMs can summarize a paragraph, it should be able to create coarse grain model of a system. Reason in words, now it can reason in atoms as well. Mirroring the microscopic atomic world; analogous to ideas like "visual thinking", "spatial memory", "sixth sense".
 
 # Architecture
-Each token can be either a text token, a real number, or a vector.
+Each token can be a text token, a real number, or a vector.
 
-Like text transformers: causal attention mask, parallel training, autoregressive generation.
+Following recent studies, equivariance is not necessary.
+Identical to a vanilla transformer, except for the embedding and prediction head for real numbers and vectors.
 
-Like geometric models: localized interaction, equivariance, tensor product, radial basis functions.
+Parameterization is compatible with the vanilla transformer — initialized from pretrained weights for free prior knowledge.
 
-For pure text input, the equivariant message passing is noop.
+For decoding, reserve a special `<|vectortoken|>`; when it is sampled, draw the next token from a 3D Gaussian instead.
 
-Parameterization compatible with the vanilla transformer — initialized from pretrained for free prior knowledge.
+I would argue a likelihood-based distribution loss is better than regression loss, so both text and vector prediction are measured in bits of entropy.
 
-For decoding, reserve a special `<|vectortoken|>`, if that is sampled, sample from a 3D Gaussian distribution instead.
+# Related Work
+AF3 dropped equivariance.
 
-I would argue a likelihood based distribution loss is better than regression loss, so both text and vector prediction are measured in bits of entropy.
+[molxformer](../reading/2025/molecule_transformer_without_graph.md) dropped graph structure as well.
+Interesting that their conclusion is that no prior is needed, except for continuous representation.
 
-
-I think the first question to ask is: what is the minimum prior a transformer needs in order to understand 3D point clouds? A spectrum could be:
-1. Proper tokenization of floats
-2. Proper embedding of floats
-3. Invariance (separating direction and distance, RBFs…)
-4. Equivariant representation (irreps, e3nn…)
-
-on prior needed for transformers to understand chemistry [](/reading/2025/molecule_transformer_without_graph.md)
-Interesting that their conclusion is no prior is needed, except for continous representation.
-So there conclusion is 2.
-However, they use GPT style pretraining + BERT style finetuning, using two different tokenization strateigies and sacrificing the ability of generative modeling.
-This paper is a very good baseline and point to start with.
+However, they use GPT-style pretraining + BERT-style finetuning, with two different tokenization strategies, sacrificing the ability to do generative modeling.
+We should also use a distribution loss instead of regression.
+This paper is a good baseline and starting point.
 
 
 # Pretraining
@@ -61,8 +62,6 @@ Curate a mix covering different
 
 Feed it with everything we have.
 
-
-
 # Fine-tuning
 ## Transformer Philosophy
 Minimal data assumption with maximal versatility (The Bitter Lesson).
@@ -72,8 +71,8 @@ Treat all vectors as coordinates.
 Global causal attention.
 
 
-Unable to model fine-grained large systems (~1M context window).
-May be also include point cloud for macroscopic, what's special about chemistry is the locality and we can generate data via computation.
+Unable to model fine-grained large systems beyond the ~1M context window.
+May also include point clouds for macroscopic systems; what's special about chemistry is locality, and we can generate data via computation.
 
 Lean towards this during pretraining.
 
@@ -87,7 +86,7 @@ Label vectors and group features (velocity, force…) by coordinates in training
 Local interactions for scalability.
 
 Markovian property for temporal sparsity.
-High quality Paired data (like structure data and the paper introduced it).
+High-quality paired data (like structure data and the paper that introduced it).
 
 
 Lean towards this during posttraining.
@@ -98,19 +97,19 @@ Supervised learning: learn from data. RL: fill the missing part necessary for ex
 
 This allows the model do something very different from UMA. Add atoms and timesteps for periodic boundary conditions, temporal interpolation, spatial extension, explicit solvent…
 
-Notice that the model does not generate the structure by calling some tools. The ability of understanding and generating structure is built-in since pretraining, allowing it to flexibly use it per instructions The lipoprotein particle is ambiguous, specifying it accurately is challenging and not necessary.
+Notice that the model does not generate the structure by calling some tool. The ability to understand and generate structure is built in since pretraining, allowing it to be used flexibly per instructions. The lipoprotein particle is ambiguous; specifying it accurately is challenging and not necessary.
 
-Notice that the prompt must contain coordinates that specifies a frame of reference, otherwise we cannot generate non-zero vector from invariant text.
+Notice that the prompt must contain coordinates that specify a frame of reference, otherwise we cannot generate a non-zero vector from invariant text.
 
 
 # Phase 1: Pretraining and Finetuning
 Reproduce a simplified UMA.
 
-1. Build the Equivariant Transformer Decoder (1 week).
+1. Build the transformer decoder (1 week). <!-- TODO: earlier the doc says we drop equivariance; was previously "Equivariant Transformer Decoder". Confirm intended scope. -->
 
-2. Obtain data and Pretrain (>4 weeks. Hard to estimate).
+2. Obtain data and pretrain (>4 weeks, hard to estimate).
 
-3. Finetuning.
+3. Finetune.
 
 # Phase 2: Ablation and Evaluation
 
@@ -120,14 +119,12 @@ If the text pretraining helps: compare against random initialization without tex
 
 
 # Downstream Tasks
-The best task may be something with little data so few/zero shot generalization is preferred, or some tasks that involve inherent ambiguity in its specification so the flexibility of text is needed.
-
 Molecular dynamics.
 Structure prediction.
-Property prediction and Classification.
+Property prediction and classification.
 
-Agentic oriented tasks.
-Suggest data points where UMA is bad and explain it?
+Agentic-oriented tasks.
+Suggest data points where UMA is bad and explain why?
 
 # Phase 3: Reinforcement Learning
 RL for longer-timescale, coarse-grained problems.
@@ -135,8 +132,3 @@ RL for longer-timescale, coarse-grained problems.
 Pure text problems, with vectors as latent only.
 
 Interpretability of chain of thought reasoning.
-
-# Q&A
-Brandon's advices, try invariant first.
-How to deal with PBC?
-Catastrophic forgetting? Data mix or LoRA?
