@@ -12,7 +12,11 @@ What is the minimum prior such a transformer needs? A spectrum of increasingly s
 
 # On the representation and generation of real numbers and vectors
 
-refer to [my design](/work/multimodal.md)
+Three families exist for emitting a real number from a transformer. Continuous heads commit to a distribution family: MSE (a fixed-variance Gaussian; Bishop 1994 showed mean-collapse on multi-modal targets), heteroscedastic Gaussian, MDN (fragile training), or modern per-token diffusion (MAR[^mar], AF3[^af3]) and Gaussian mixture (GIVT[^givt]) heads. They cost a separate denoiser or distribution-fitting machinery and a loss-weight against the cross-entropy on text. Naive subword/digit tokenization (Regression Transformer, LIFT[^lift]) embeds floats as text — sequence length blows up, bin adjacency is lost. One-token-per-quantile-bin (molxformer[^molxformer], Chronos[^chronos], WaveNet) keeps sequences compact and unifies the loss but ignores ordinality on the bin vocab; Token-Mol[^tokenmol] patches this with a Gaussian Cross-Entropy soft label centered on the true bin, and residual-codebook stacks (VQ-VAE[^vqvae], RQ-Transformer[^rqt], EnCodec[^encodec]) replace one bin with K codebook indices emitted by a per-slot inner AR head. For 3D coordinates the geometric variant is octree subdivision (Uni-3DAR[^uni3dar] at the outer sequence; VAR[^var] as next-scale prediction).
+
+Each predecessor leans on data assumptions we want to drop. molxformer/Token-Mol fix a global bin grid (assumes targets have a known range and roughly uniform density across it). MDN and GIVT pick K modes a priori (assumes the distribution's shape). RQ-Transformer learns a codebook (assumes the training distribution covers the regions a learned codebook can find). Uni-3DAR assumes a canonical BFS ordering of points (assumes the input data is sparse, locally clustered, and order-invariant) and tokenizes only coordinates, not arbitrary continuous payloads. MAR's diffusion head needs a noise schedule tuned to the target's scale.
+
+Our Continuous Token Transformer drops all of these: no sparsity, no locality, no fixed magnitude range, no codebook to learn, no distribution family, no permutation-invariance assumption. We assume only that each value is a double (and it's easy to support unbounded precision if ever necessary). Cross-entropy is the single loss across text, scalars, and vectors, with no coefficient to balance.
 
 # On the neccessity of Equivariance and Locality
 
@@ -165,3 +169,4 @@ Per-slot inner AR head (closest architectural family to the Continuous Token Tra
 [^rqt]: Lee et al. 2022, "Autoregressive Image Generation using Residual Quantization." CVPR. <https://arxiv.org/abs/2203.01941>
 [^encodec]: Défossez et al. 2022, "High Fidelity Neural Audio Compression" (EnCodec); Zeghidour et al. 2021, "SoundStream: An End-to-End Neural Audio Codec." <https://arxiv.org/abs/2210.13438>
 [^var]: Tian et al. 2024, "Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction." NeurIPS best paper. <https://arxiv.org/abs/2404.02905>
+[^tokenmol]: Wang et al. 2024, "Token-Mol 1.0: tokenized drug design with large language models." <https://arxiv.org/abs/2407.07930>

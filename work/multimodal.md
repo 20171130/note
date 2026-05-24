@@ -50,6 +50,18 @@ The merit of BFS is efficient common-ancestor path compression — no need to re
 I am talking about an autoregressive head for sampling a float or double-precision vector from the output of the final layer. For a 3D vector, sample from 8 octants 64 times for double precision, 32 times for float. (For a scalar, replace octants with binary halves and the step counts roughly double.)
 Autoregressive generation within a token.
 
+### In-token AR head — example: `one inch is 2.54 cm`
+
+![Continuous Token Transformer in-token AR head](../image/continuous_token_head.svg)
+
+Outer sequence is the usual LLM token stream — text plus a special numeric token (e.g. `<scalar_token>`, `<vector_token>`). A numeric token branches off into a small inner AR head conditioned only on that token's final hidden state (no extra context attention), emitting bits coarse → fine: sign (1 bit), exponent (11 bits, MSB → LSB), mantissa (52 bits, MSB → LSB) — 64 inner steps for a double, 32 for a float.
+
+For a 3D vector, replace `<scalar_token>` with `<vector_token>` and emit all three axes jointly per step, so each subtoken is one of `2^3 = 8` octant states (one bit per axis at the current depth). Same coarse-to-fine ordering, same K, preserves cross-axis correlation.
+
+Compression: multiple bit-levels can be packed into one inner subtoken (e.g. `2^16 = 65536` sub-vocab states sampling 4 times for a double), trading inner-step count for a wider per-step vocab. Not performance-critical since the inner head is light-weight.
+
+Source: [continuous_token_head.d2](../image/continuous_token_head.d2) — render with `d2 --layout elk continuous_token_head.d2 continuous_token_head.svg`.
+
 ## Open design questions
 Core idea is settled (continuous-token AR, octree inner head, drop equivariance, multimodal text-vector interleaving); the following details are still open and should be resolved (RQ-Transformer read will inform several):
 
