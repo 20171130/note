@@ -90,6 +90,12 @@ Unified group-conv architecture (Rapidash) used to compare equivariant vs uncons
 See [reading note](../../reading/2025/vadgama.md).
 Outbound links: molxformer, AF3, Rapidash, e3nn.
 
+### uni3dar_2025
+Title: Uni-3DAR: Unified Cross-Scale 3D Generation and Understanding via Autoregressive Modeling[^uni3dar]
+DP Technology (Lu, Lin, Yao, Gao et al.). Discrete spatial tokenization via octree BFS (256-state nodes via 8-child occupancy mask), with 2-level subtree compression and masked next-token prediction. Beats diffusion baselines on molecule generation, crystal structure prediction (+256% relative on PXRD-CSP), pocket prediction, docking, and ShapeNet, with ~21.8x faster inference. Widest scale-range existence proof for discrete-AR + 3D in the survey.
+See [reading note](../../reading/2025/uni3dar.md).
+Outbound links: octree, VQ-VAE, molxformer, DiffCSP, EDM, LION, multi-frame conditioning.
+
 # 2024
 
 ### alphafold3_2024
