@@ -12,31 +12,7 @@ What is the minimum prior such a transformer needs? A spectrum of increasingly s
 
 # On the representation and generation of real numbers and vectors
 
-## Distribution heads
-Two families.
-
-Continuous heads (predict parameters of a continuous distribution):
-1. Fixed-σ Gaussian = MSE. Baseline. No uncertainty, mean-collapses on multi-modal targets.
-2. Heteroscedastic Gaussian (predict μ and σ). One extra linear head, same inference cost, free per-token uncertainty. Still unimodal.
-3. Full-Σ Gaussian via Cholesky. Captures correlated anisotropic noise; cheap for 3D vectors.
-4. Gaussian Mixture (MDN, K components). First real multi-modality; training fragile (see below).
-5. Per-token diffusion or score-matching head. Most expressive, sampleable, no mode collapse. AF3, MAR. Extra denoiser network and K inference steps (distillable).
-
-Discrete heads (shard the value space into a finite vocabulary, predict like text tokens):
-6. Per-axis categorical over quantile bins. K bins per axis, D axes → D cross-entropies. Stable training, arbitrary marginal shape, tokenization-compatible with the LLM stack. molxformer, WaveNet, Chronos. Loses cross-axis structure unless each axis is conditioned on the previous.
-7. Spatial-cell categorical. Shard 3D space into a single vocabulary (uniform cubes, octree nodes, or a learned VQ codebook), predict one token per cell. Captures 3D shape directly, supports coarse-to-fine generation. Uni-3DAR[^uni3dar] (Lu et al. 2025, DP Technology) is the principal recent example: octree tokenizer with up to 8x subtree compression, unified across molecules / proteins / polymers / crystals / macroscopic objects, autoregressive on the resulting 1D sequence, reports up to +256% over diffusion baselines and 21.8x faster inference.
-
-I am interested in the octo-tree like decoding
-
-## Why GMM is harder than it looks
-- Mode collapse / dead components: one component takes all responsibility early, the rest get vanishing gradients and never recover. Effective K shrinks toward 1.
-- σ → 0 singularity: a component can shrink variance around one datapoint to make likelihood unbounded. Needs a lower bound on σ or an explicit prior.
-- logsumexp gradient flow: gradients are weighted by normalized component posteriors; once one component dominates by orders of magnitude, the others stop learning. Feeds back into the previous two problems.
-- K is a fixed hyperparameter, picked before training.
-- Init sensitivity (all μ_k near zero with equal π → permanent collapse); k-means init on a batch helps.
-- All of the above amplify under varied neural-net conditioning contexts.
-
-Mitigations exist (σ clipping, gradient clipping, π temperature schedules, MoE-style load-balancing aux loss) but are engineering overhead that should be deferred unless multi-modality is shown to matter.
+refer to [my design](/work/multimodal.md)
 
 # On the neccessity of Equivariance and Locality
 
@@ -93,6 +69,7 @@ Outbound links: molxformer, AF3, Rapidash, e3nn.
 ### uni3dar_2025
 Title: Uni-3DAR: Unified Cross-Scale 3D Generation and Understanding via Autoregressive Modeling[^uni3dar]
 DP Technology (Lu, Lin, Yao, Gao et al.). Discrete spatial tokenization via octree BFS (256-state nodes via 8-child occupancy mask), with 2-level subtree compression and masked next-token prediction. Beats diffusion baselines on molecule generation, crystal structure prediction (+256% relative on PXRD-CSP), pocket prediction, docking, and ShapeNet, with ~21.8x faster inference. Widest scale-range existence proof for discrete-AR + 3D in the survey.
+
 See [reading note](../../reading/2025/uni3dar.md).
 Outbound links: octree, VQ-VAE, molxformer, DiffCSP, EDM, LION, multi-frame conditioning.
 
@@ -154,6 +131,11 @@ Discrete spatial tokenization:
 - Uni-3DAR (Lu et al. 2025, DP Technology)[^uni3dar] — octree coarse-to-fine tokenizer with up to 8x subtree compression; unified autoregressive model across molecules, proteins, polymers, crystals, and macroscopic 3D objects; claims up to +256% over diffusion baselines and 21.8x faster inference.
 - VQ-VAE (van den Oord et al. 2017)[^vqvae] — learned discrete codebook over continuous embeddings; foundation for the VQ→AR-token pipeline used widely in image/audio.
 
+Per-slot inner AR head (closest architectural family to the Continuous Token Transformer design):
+- RQ-Transformer (Lee et al. 2022)[^rqt] — residual VQ with a small "depth transformer" per outer slot that autoregressively emits a stack of codebook indices. Direct precedent for in-token AR over discrete codes.
+- SoundStream / EnCodec (Zeghidour et al. 2021 / Défossez et al. 2022)[^encodec] — residual-VQ neural audio codec; same depth-stack tokenization that downstream audio LMs (AudioLM, MusicGen) decode via per-slot AR heads.
+- VAR (Tian et al. 2024)[^var] — "next-scale" prediction; coarse-to-fine generation over outer-sequence positions rather than an inner head, but the same coarse-to-fine philosophy applies.
+
 
 [^molxformer]: <https://arxiv.org/abs/2510.02259>
 [^esen]: Fu et al. 2025, "Learning smooth and expressive interatomic potentials for physical property prediction." <https://arxiv.org/abs/2502.12147>
@@ -180,3 +162,6 @@ Discrete spatial tokenization:
 [^lift]: Dinh et al. 2022, "LIFT: Language-Interfaced Fine-Tuning for Non-Language Machine Learning Tasks." NeurIPS. <https://arxiv.org/abs/2206.06565>
 [^vqvae]: van den Oord et al. 2017, "Neural Discrete Representation Learning." NeurIPS. <https://arxiv.org/abs/1711.00937>
 [^uni3dar]: Lu et al. 2025, "Uni-3DAR: Unified 3D Generation and Understanding via Autoregressive Modeling on Compressed Spatial Tokens." DP Technology. <https://arxiv.org/abs/2503.16278>
+[^rqt]: Lee et al. 2022, "Autoregressive Image Generation using Residual Quantization." CVPR. <https://arxiv.org/abs/2203.01941>
+[^encodec]: Défossez et al. 2022, "High Fidelity Neural Audio Compression" (EnCodec); Zeghidour et al. 2021, "SoundStream: An End-to-End Neural Audio Codec." <https://arxiv.org/abs/2210.13438>
+[^var]: Tian et al. 2024, "Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction." NeurIPS best paper. <https://arxiv.org/abs/2404.02905>

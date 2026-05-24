@@ -1,4 +1,6 @@
 # TODO
+Continuous Token Transformer
+
 Think more carefully about architecture, training data, and evaluation tasks.
 
 Brandon:
@@ -8,11 +10,15 @@ Besides architecture, another problem is data, and it's a huge problem.
 
 Also on evaluation, what task is optimal for demonstrating our motivation? The best task may be something with little data so few/zero shot generalization is preferred, or some tasks that involve inherent ambiguity in its specification so the flexibility of text is needed.
 
+Naming note: "Continuous Tokens" is the headline phrase of Fluid (Fan et al. 2024, "Scaling Autoregressive Text-to-image Generative Models with Continuous Tokens"), and MAR / GIVT cluster around the same terminology. Frame this work as the discrete-octree-head variant within that family rather than as a new line — the differentiator is the inner-AR octree subdivision head, not the umbrella term.
+
 # History
 Originally I designed a transformer for MD trajectories.
 Zack suggested it should be applicable to all atomic, or even macroscopic, point clouds.
 Then I changed it to a generative equivariant transformer.
 Brandon and Ray suggested we can drop equivariance entirely.
+Then after reading uni3dar_2025, recommended to me by Aaron, I invented in-token autoregressive generation for sampling numerical values and vectors.
+Then the idea was generalized to the Continuous Token Transformer.
 
 # Motivation
 
@@ -37,6 +43,19 @@ Parameterization is compatible with the vanilla transformer — initialized from
 For decoding, reserve a special `<|vectortoken|>`; when it is sampled, draw the next token from a 3D Gaussian instead.
 
 I would argue a likelihood-based distribution loss is better than regression loss, so both text and vector prediction are measured in bits of entropy.
+
+I think the [octree](uni3dar_2025) is a good idea.
+The problem is that it is good only for coordinate generation, not for predicting arbitrary vectors like force. They also assume that the order in which points appear in the data does not matter and can be reordered into a BFS tree, which itself imposes an assumption on the data. Both are things I would like to avoid.
+The merit of BFS is efficient common-ancestor path compression — no need to repeat the ancestors when generating siblings. However, we make this observation: embedding and encoding do not have to match the decoding generative process, as long as tokenization is aligned. We can embed using the continuous value directly, not via tree tokens; during decoding, we repeatedly and autoregressively sample multiple octree subdivision steps from the final representation.
+I am talking about an autoregressive head for sampling a float or double-precision vector from the output of the final layer. For a 3D vector, sample from 8 octants 64 times for double precision, 32 times for float. (For a scalar, replace octants with binary halves and the step counts roughly double.)
+Autoregressive generation within a token.
+
+## Open design questions
+Core idea is settled (continuous-token AR, octree inner head, drop equivariance, multimodal text-vector interleaving); the following details are still open and should be resolved (RQ-Transformer read will inform several):
+
+1. Continuous-input embedding. xVal-style single token with value-scaled embedding, vs Fourier features at multiple frequencies, vs MLP encoder over the raw value. Trade compactness vs smoothness.
+2. Inner head architecture. Per-step MLP (cheapest), mini-transformer over the K-step inner sequence (most expressive, like RQ's depth transformer), or shared head with explicit step-position embedding.
+
 
 # Related Work
 AF3 dropped equivariance.
@@ -103,13 +122,7 @@ Notice that the prompt must contain coordinates that specify a frame of referenc
 
 
 # Phase 1: Pretraining and Finetuning
-Reproduce a simplified UMA.
 
-1. Build the transformer decoder (1 week). <!-- TODO: earlier the doc says we drop equivariance; was previously "Equivariant Transformer Decoder". Confirm intended scope. -->
-
-2. Obtain data and pretrain (>4 weeks, hard to estimate).
-
-3. Finetune.
 
 # Phase 2: Ablation and Evaluation
 
