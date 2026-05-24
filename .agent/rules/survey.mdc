@@ -3,7 +3,6 @@ description: Finding information and writing it down: sourcing, citations, liter
 alwaysApply: false
 ---
 
-
 # Academic Writing
 - Write findings into a note with inline references `[text](url)` at point of use.
 - Notes (including logs) are readable prose, not append-only transcripts. Keep only what reflects current understanding; remove outdated or redundant content once resolved. Prefer brief conclusions with citations over raw technical detail.
@@ -13,28 +12,26 @@ alwaysApply: false
 When surveying a topic, create `/knowledge/survey_{topic}.md` organized as:
 
 ```markdown
-
 # Summary
 First, describe the central topic.
 Describe milestone breakthroughs and paradigm shifts, trends and current focus of work.
 Distinguish established best practice (or competing popular paradigms), emerging practice (solid results, not yet widely adopted), and questionable one-offs (weak results, or strong claims with no follow-up years after publication).
 
-
 # Read List
 ## {Year}
-### label (example attention_is_all_you_need_2017)
+### label, e.g. `attention_is_all_you_need_2017`
 Title
-Summary (may refer to other items); if there is already a reading note `reading/`, normalize and only keep link.
+Summary (may contain references)
 Outbound links: important keywords and citations.
 
 # To Read List
 keywords and citations
 ```
 
-Iterate the following steps:
-1. Search keywords or follow citations; append to the To Read list.
-2. Pick the most promising entry, read it, and add a section for it.
-3. Update the summary; pause every 3–5 papers to report new finds and let the user adjust direction.
-4. Remove the entry from the To Read list and append its outbound links.
+## Crawl
+Loop: pick the top To-Read entry, download to `note/tmp/<label>.{pdf,html}`, read it, add a Read-List entry, then refresh To-Read from its citations and keywords. Update the Summary every 3–5 papers and check in with the user.
 
-> PDFs: use `python -c "from pypdf import PdfReader; ..."` to extract text. Fall back to ar5iv HTML (https://ar5iv.labs.arxiv.org/html/<id>) only if the PDF is scanned (no embedded text) or precise math/figure layout matters.
+> Extract PDF text with `pypdf`; fall back to ar5iv (`https://ar5iv.labs.arxiv.org/html/<id>`) only when the PDF is scanned or layout matters.
+
+## Read
+When the user drafts his own summary for an entry, read the paper yourself, [review](writing#review) the user's summary and interact to resolve questions, then [fix](writing#fix), [optimize](writing#optimize), and finally [normalize](writing#normalize) by moving the body to `reading/<year>/<label>.md`.

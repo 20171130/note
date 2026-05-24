@@ -465,3 +465,4 @@ __marimo__/
 .cursor/
 .llms/
 .claude/
+tmp/

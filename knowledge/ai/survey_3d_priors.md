@@ -29,6 +29,20 @@ UC Berkeley + LBNL (Kreiman, Bai, Atieh, Weaver, Qu, Krishnapriyan). Not a FAIR 
 See [reading note](../../reading/2025/molecule_transformer_without_graph.md).
 Outbound links: OMol25, eSEN, UMA, Eissler 2025, Uni-Mol, AlphaFold 3, ADiT, Molecular Conformer Fields.
 
+### omol25_2025
+Title: The Open Molecules 2025 (OMol25) dataset, evaluations, and models[^omol25]
+FAIR Chem (Levine et al.). Molecules-only DFT dataset (no PBC; FAIR's periodic datasets are OC20/OC22/OMat24) plus the baseline MLIP zoo (eSEN, GemNet-OC, MACE, UMA) used by molxformer.
+That's why molxformer uses it, without the need to deal with PBC. I think CoT or input augmentation is needed for PBC.
+See [reading note](../../reading/2025/omol25.md).
+Outbound links: eSEN, UMA, GemNet-OC, MACE, molxformer.
+
+### esen_2025
+Title: Learning Smooth and Expressive Interatomic Potentials for Physical Property Prediction[^esen]
+FAIR Chem (Fu, Wood, Barroso-Luque, Levine, Gao, Dzamba, Zitnick). OMol25 reference baseline and the small-model backbone inside UMA[^uma]; same equivariant-GNN-with-e3nn-irreps family as MACE / NequIP / Allegro, descended from eSCN / EquiformerV2.
+Argues lower test error only correlates with downstream property prediction when the MLIP passes a practical energy-conservation diagnostic on OOD NVE MD.
+Direct-force pretraining + conservative finetuning and MD simulation.
+See [reading note](../../reading/2025/esen.md).
+Outbound links: OMol25, UMA, MACE, NequIP, Allegro, eSCN, EquiformerV2, Matbench-Discovery.
 
 # Closest Related Work — Transformers on 3D Coordinates
 
@@ -46,14 +60,14 @@ molxformer is the first to push this to a fully unmodified decoder transformer (
 For context only (GNNs on 3D coordinates, dropped equivariance but kept graph): EScAIP[^escaip], Orb[^orb], PET-MAD[^petmad]. Cited as the "level 3" cohort showing equivariance is not strictly necessary, but not transformers.
 
 
-# eSEN vs MACE / NequIP / Allegro
-
-eSEN[^esen] (Fu et al. 2025, "Learning Smooth and Expressive Interatomic Potentials") is the OMol25 reference baseline and the small-model backbone inside UMA[^uma]. Same family as MACE/NequIP/Allegro (equivariant GNN with e3nn irreps), but tuned for smoothness (continuous derivatives → stable MD) and expressivity. Comes in direct-force (`-d`) and conservative (`-c`, energy-gradient) variants. At 6M parameters it is state of the art on OMol25; chosen as molxformer's reference because it is small enough for FLOP-matched comparison while beating older equivariant baselines. Not a different paradigm — just the OMol25-era FAIR successor.
-
-
 # To Read List
 
-Henry's queue: eSEN[^esen], AlphaFold 3[^af3], omol25
+Henry's queue: AlphaFold 3[^af3]
+
+
+
+
+
 Then, Molecular Conformer Fields, ADiT, Simple-MD Transformer, Probing equivariance & symmetry breaking.
 
 Available for me:

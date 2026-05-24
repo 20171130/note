@@ -7,7 +7,7 @@ Learning
 
 # Advanced or Specific
 > All refered in [writing](rules/writing.mdc)
-Survey
+Survey (crawl, read)
 Innovation
 Planning
 Coding
