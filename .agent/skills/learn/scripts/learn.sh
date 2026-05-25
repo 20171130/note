@@ -10,6 +10,7 @@
 #   learn.sh --include-wip   also include uncommitted changes
 #   learn.sh --mark          record HEAD as scanned (run after review)
 #   learn.sh --base          print the current baseline commit
+#   learn.sh --commit ...    git commit as Galatea (passes args through, e.g. -m "msg")
 #   learn.sh --pull          pull current branch + learner-baseline from origin
 #   learn.sh --push          mark HEAD, push current branch + learner-baseline, then possess
 #   learn.sh -h | --help     show this help
@@ -19,9 +20,19 @@ set -euo pipefail
 REF="refs/heads/learner-baseline"
 BRANCH="learner-baseline"
 REMOTE="origin"
+GALATEA_NAME="Galatea"
+GALATEA_EMAIL="galatea@bi.local"
 cd "$(git rev-parse --show-toplevel)"
 
-show_help() { sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; }
+# Galatea-authored commit: scoped to this script so the repo's default identity
+# stays whatever the user configured globally. Forward all remaining args to
+# git commit (e.g. -m "...", -a, --amend).
+if [[ "${1:-}" == "--commit" ]]; then
+  shift
+  exec git -c "user.name=$GALATEA_NAME" -c "user.email=$GALATEA_EMAIL" commit "$@"
+fi
+
+show_help() { sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'; }
 
 REPO_ROOT=$(git rev-parse --show-toplevel)
 POSSESS="$REPO_ROOT/.agent/skills/possess/scripts/possess.py"

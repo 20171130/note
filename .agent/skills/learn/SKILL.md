@@ -51,6 +51,6 @@ This also applies to long-term goals, so open a task for Henry to discuss his re
 When you see a task, make sure it has sensible timestamps and is properly scheduled. Every task must have a scheduled or due date so it can be reviewed or rescheduled — a vague wishlist item is better off deleted than left to be procrastinated indefinitely.
 
 # Commit and Push
-After consolidating, commit once the user approves your edits.
+After consolidating, run `.agent/skills/learn/scripts/learn.sh --commit -m "<message>"` once the user approves your edits — this commits as `Galatea` so the repo's default identity stays Henry's.
 Run `.agent/skills/learn/scripts/learn.sh --push` to mark HEAD as the new `learner-baseline`, push the current branch and the marker, then possess Devmate + Claude at `$HOME` and Cursor at the note repo so `rules` and `skills` are applied everywhere.
 Remind Henry to learn from the new lessons as well.
