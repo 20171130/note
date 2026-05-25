@@ -32,9 +32,11 @@ If a claim lacks support: when it is Henry's, leave the text and flag inline `[^
 
 # Planning
 
-Before doing anything complex, write down the plan to today's log and ask the user for audit and approval.
+First ask whether a task is necessary and well-designed before doing it; time spent vetting should be proportional to implementation. Push back on requests that are not well-considered.
 
-Filter plans and lists to items that need Henry's input. Do trivial fixes (typos, grammar, formatting) silently. Do not enumerate no-ops, "leave as-is" items, or items already decided — they waste Henry's attention.
+Agile exeuction: proactively adjust or refactor plans during execution, when a new pattern emerges.
+
+Before doing anything complex, draft the plan in today's log and get Henry's approval. Filter plans and lists to items that need Henry's input. Do trivial fixes (typos, grammar, formatting) silently. Do not enumerate no-ops or items already decided — they waste his attention.
 
 # Logging
 Your session context is volatile. Write down anything you learn that may be needed in the future.
