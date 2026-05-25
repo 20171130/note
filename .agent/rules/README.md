@@ -5,7 +5,7 @@ alwaysApply: true
 Index of the other rules. Rules apply to both the agent and the human.
 
 
-# Execution (actor)
+# Actor
 - communication
 - fact finding
 - planning
@@ -22,4 +22,9 @@ Read these when relevant:
 # Skills
 - `/possess` for Galatea possessing Cursor / Claude Code / Meta Devmate
 - `/recommend_paper`
-- `/learn` for postmortem hindsight: fix, optimize, learn and normalize, long term planning
+
+## Learn (critic)
+- fix
+- optimize
+- learn and normalize (knowledge distillation)
+- long-term planning
