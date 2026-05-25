@@ -15,6 +15,26 @@ My two needs emerged as I experimented with OpenClaw from 2026-05-08.
 For the first, heartbeat and cron is needed, maybe also discord notification and persistent session.
 For the second, Cursor/Claude Code is good. How can I integrate them?
 
+# Principles
+Dex Horthy observed a sweet zone: LLM is the best within the first 100K tokens.
+This induces the first two principles.
+
+## Memory hierarchy
+ just like my global rules - optional rules - knowledge - log
+file system instead of vector database
+frequent intentional compaction, or init from file system
+Some find json is better than markdown since AI is less likely to fuck up structured data without syntax error.
+上下文窗口污染缓解：最小化控制台输出，日志写入文件，使用 grep 友好的错误格式（ERROR: [reason] 单行），预计算聚合统计而非输出原始数据。
+
+## Agent collaboration
+Needed only when single agent context becomes longer than sweet zone.
+Or when there are different priorities, like plan-execution-logging vs learning and consolidation.
+Single agent where we can, multiagent where we must.
+
+## Workflow
+Plan and verification, this is what I should incorporate
+consolidation should be a background task, from the perspective of a agent without context mimicing an agent reading this after fresh start
+
 # Cursor
 1. User level rules via Cursor setting.
 2. Project and fine-grained: `.cursor/rules/.mdc` files (`.cursorrules` is legacy). placed at project root. Can set always apply/ match file path/ manual apply via @ and intelligent apply.
