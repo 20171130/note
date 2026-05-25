@@ -18,18 +18,27 @@ Each predecessor leans on data assumptions we want to drop. molxformer/Token-Mol
 
 Our Continuous Token Transformer drops all of these: no sparsity, no locality, no fixed magnitude range, no codebook to learn, no distribution family, no permutation-invariance assumption. We assume only that each value is a double (and it's easy to support unbounded precision if ever necessary). Cross-entropy is the single loss across text, scalars, and vectors, with no coefficient to balance.
 
-# On the neccessity of Equivariance and Locality
+# On the Necessity of Equivariance and Locality
 
 Empirical question: how far up this spectrum must one go to match equivariant baselines, and where does scaling compensate for missing priors?
 
-Strict equivariance is genuinely being abandoned. Within MLIP GNNs, multiple 2024–2025 papers (Orb, EScAIP, PET-MAD) drop hard E(3)-equivariance but keep a spatial graph (radial cutoff) and recover competitive accuracy with more data. This is solid emerging practice.
+Strict equivariance is genuinely being abandoned. Within MLIP GNNs, multiple 2024–2025 papers (Orb[^orb], EScAIP[^escaip], PET-MAD[^petmad]) drop hard E(3)-equivariance but keep a spatial graph (radial cutoff) and recover competitive accuracy with more data. This is solid emerging practice.
 
-Going further — dropping the spatial graph itself and feeding raw coordinates to a transformer — is rarer but no longer a single paper. molxformer (Kreiman et al. 2025) and AlphaFold 3 (Abramson et al. 2024) both fit here: no E(3) equivariance, no radial cutoff, attention is global at the relevant scale.
-In the middle sit Eissler 2025 (edge tokens with pair-distance + displacement embeddings, drops equivariance and conservation) and Uni-Mol 2023 (atom tokens with pair-distance attention bias) — no explicit graph but distance is still privileged in the architecture. The headline result is qualified: molxformer's 1B-param transformer matches a 6M-param eSEN on energy and *loses on forces* at matched FLOPs. Promising small cohort, not yet a settled trend; needs reproduction at another lab on the MLIP side and a closed force gap.
+In the middle sit Uni-Mol 2023[^unimol] (atom tokens with pair-distance attention bias), Eissler 2025[^eissler] (edge tokens with pair-distance + displacement embeddings), and AlphaFold 3[^af3] (token-level pair representation with triangular updates). All three drop equivariance and any radial-cutoff graph; AF3 and Eissler also drop energy conservation. What they keep is a pair representation with triangular updates — 3-WL expressive in one layer, but O(N³) in cost. Distance is no longer baked into the graph, but it is still privileged in the architecture.
 
-It seems that dropping equivariance is a trend, simplifies the neural network, better structural compatibility with LLMs, less assumption on data. But omol25 says careful treatment for smoothness and energy conservation is necessary for MD and downstream tasks. The solution may be skip MD integration altogether, use CoT as an alternative. Although symmetry is dominant for fundamental physics, it loses its lofty status as we move toward larger-scale, coarse-grained, approximate models.
+Going further, molxformer (Kreiman et al. 2025)[^molxformer] drops the pair representation as well and feeds raw coordinates straight into a node-token transformer. The theoretical price is lower than the GNN intuition suggests: for combinatorial graphs, edge message passing is strictly more expressive than node-only (regular graphs cannot be distinguished by 1-WL), but this argument does not transfer to point clouds with coordinates. Two atoms with different `xyz` are already different tokens, and deep attention can synthesize pair and triple features across layers, so a node-token transformer over coordinates is universal in the limit. What it lacks is symmetry, not expressiveness — the same physical structure under rotation maps to different representations (the input-to-representation map is multi-valued), but distinct physical structures always map to distinct representations (injective). The cost is paid in inductive bias and sample complexity, not in reachable function class. The headline result is qualified: molxformer's 1B-param transformer matches a 6M-param eSEN[^esen] on energy and *loses on forces* at matched FLOPs.
 
-Counter-evidence: Vadgama et al. 2025, under controlled head-to-head comparison, find equivariant models still beat unconstrained ones on QM9 / ShapeNet / CMU motion, and capacity scaling does not fully close the gap. Their benchmarks are small-data; the open question is whether the trend papers' regime (OMol25-scale, AlphaFold-scale) genuinely escapes this.
+This is the underlying tradeoff: a pair representation with triangular updates buys 3-WL expressivity in one layer at O(N³) compute, so the model can stay tiny in params; plain node-token attention is O(N²) per layer but must recover the same expressive ground across depth and data, so it pays in parameters and tokens instead.
+
+| Model       | Pair structure         | Compute per layer | Params       |
+|-------------|------------------------|-------------------|--------------|
+| MD-ET       | edge tokens + triangle | O(N³)             | ~5M (estimated from hyperparameters; not disclosed) |
+| AlphaFold 3 | pair rep + triangle    | O(N³)             | ~100–300M (not disclosed; Boltz-1 ≈ 150M, Chai-1 ≈ 200M as open proxies, with most params likely in the Pairformer rather than the diffusion module) |
+| molxformer  | node tokens, no pair   | O(N²)             | 1B |
+
+Dropping equivariance simplifies the architecture, aligns better with LLM stacks, and assumes less about the data. OMol25[^omol25] is the standing caveat: careful treatment of smoothness and energy conservation remains necessary for MD and downstream tasks. One way out is to skip MD integration altogether and predict future directly instead (possibly with CoT). Symmetry is dominant for fundamental physics but loses its lofty status as we move toward larger-scale, coarse-grained, approximate models.
+
+Counter-evidence with caveats: Vadgama et al. 2025[^vadgama], under controlled head-to-head comparison, find equivariant models still beat unconstrained ones on QM9 / ShapeNet / CMU motion, and capacity scaling does not close the gap. But all comparisons are within Rapidash, a regular group-conv architecture — no transformer baseline is tested — and the scaling ablation is a single pair of hidden-dim sizes (256 vs 512), under one order of magnitude. So the result is "more equivariance beats less equivariance, within group convs, at small data", not yet a refutation of the molxformer / AF3 bet of "drop equivariance, switch to large pretrained transformer, scale data". The open question — whether the gap closes once you change both architecture family and data regime — is not addressed.
 
 # Read List
 
@@ -59,14 +68,14 @@ Outbound links: OMol25, UMA, MACE, NequIP, Allegro, eSCN, EquiformerV2, Matbench
 ### eissler_2025
 Title: How simple can you go? An off-the-shelf transformer approach to molecular dynamics[^eissler]
 TU Berlin / BIFOLD + Google DeepMind (Eissler, Korjakow, Ganscha, Unke, Müller, Gugler). Closest published precursor to molxformer.
-MD-ET: an Edge Transformer (edge tokens, triangular attention, O(N³)) with pair-distance + displacement embeddings, no built-in equivariance (learned via O(3) augmentation), no energy conservation (direct force). SOTA on several MD benchmarks after few-shot finetune from QCML pretraining, but runaway energy drift in long NVE MD on larger structures — concrete failure mode of dropping conservation.
+MD-ET: an Edge Transformer over the fully connected atom graph, tokens are edges (N×N), 3-WL expressive via triangular attention that softmax-einsums pair features `il, lj -> ij` across the intermediate index `l`. No built-in equivariance (learned via O(3) augmentation), no energy conservation (direct force), no cutoff. SOTA on several MD benchmarks after few-shot finetune from QCML pretraining, but runaway energy drift in long NVE MD on larger structures — concrete failure mode of dropping conservation.
 See [reading note](../../reading/2025/eissler.md).
 Outbound links: molxformer, Uni-Mol, eSEN, Orb, PET, QCML.
 
 ### vadgama_2025
 Title: Probing equivariance and symmetry breaking in convolutional networks[^vadgama]
-AMLab Amsterdam + New Theory AI (Vadgama et al.). The principal counter to the drop-equivariance narrative.
-Unified group-conv architecture (Rapidash) used to compare equivariant vs unconstrained variants under matched conditions. Finds equivariance still wins when aligned with task geometry; capacity scaling helps both but does not close the gap; explicit pose-conditioned symmetry breaking on top of an equivariant backbone is the strongest recipe. Benchmarks are small-data (QM9, ShapeNet, CMU motion), so does not directly refute the trend at MLIP / AlphaFold scale.
+AMLab Amsterdam + New Theory AI (Vadgama et al.). The cleanest published counter to the drop-equivariance narrative, with limits.
+Unified group-conv architecture (Rapidash) used to compare SE(3) vs SO(3) vs T(3)-only variants under matched conditions. Finds equivariance still wins when aligned with task geometry; capacity scaling helps both but does not close the gap; explicit pose-conditioned symmetry breaking on top of an equivariant backbone is the strongest recipe. Limits: all comparisons stay inside Rapidash (no transformer baseline, no pretrained-init transfer), the scaling ablation is a single pair of hidden-dim sizes (under one order of magnitude), and benchmarks are small-data (QM9, ShapeNet, CMU motion). Does not directly address the molxformer / AF3 bet of "large pretrained transformer + scale".
 See [reading note](../../reading/2025/vadgama.md).
 Outbound links: molxformer, AF3, Rapidash, e3nn.
 

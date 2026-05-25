@@ -174,6 +174,8 @@ Specialist baselines exist; matching them with one unified model is the generali
 ## Reinforcement Learning
 Supervised learning: learn from data. RL: fill the missing part necessary for explaining but missing from data (only question and answer in dataset), where no supervision signal is available.
 
+Molecular dynamics is Chain-of-Thought in essence, but it is usually verbose and most of the intermediate steps are trivial. Predicting an MD trajectory or a relaxation path while skipping these trivial steps — rather than running explicit numerical integration — is a natural starting point for RL.
+
 This allows the model do something very different from UMA. Add atoms and timesteps for periodic boundary conditions, temporal interpolation, spatial extension, explicit solvent…
 
 Notice that the model does not generate the structure by calling some tool. The ability to understand and generate structure is built in since pretraining, allowing it to be used flexibly per instructions. The lipoprotein particle is ambiguous; specifying it accurately is challenging and not necessary.

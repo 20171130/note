@@ -40,7 +40,7 @@ First [review](#review) and [fix](#fix).
 Verbosity harms readability, wastes attention and tokens.
 Write as concisely as the rule files. Focus on what and why, not how.
 Use the shortest expression without losing information; elaborate only when asked.
-Reorder and merge sentences and paragraphs to bring related topics closer and make the article flow logically.
+Make structural changes: reorder and merge sentences and paragraphs to bring related topics closer and make the article flow logically.
 
 # Normalize
 First [review](#review), [fix](#fix), and [optimize](#optimize).

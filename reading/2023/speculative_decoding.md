@@ -1,3 +1,7 @@
+---
+title: Fast Inference from Transformers via Speculative Decoding
+arxiv: 2211.17192
+---
 Very intuitive idea.
 We can use a smaller and faster model to decode, and use the original model for parallel verification.
 They may have different distributions, but they can agree after discrete multimodal sampling.

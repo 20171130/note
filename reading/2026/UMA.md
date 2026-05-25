@@ -1,3 +1,7 @@
+---
+title: "UMA: A Family of Universal Models for Atoms"
+arxiv: 2506.23971
+---
 # UMA: A Family of Universal Models for Atoms
 
 **NeurIPS 2025** — Wood, Dzamba, Fu, Gao, Shuaibi et al. (FAIR at Meta, CMU)

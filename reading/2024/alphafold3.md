@@ -1,3 +1,7 @@
+---
+title: Accurate Structure Prediction of Biomolecular Interactions with AlphaFold 3
+doi: 10.1038/s41586-024-07487-w
+---
 # Accurate Structure Prediction of Biomolecular Interactions with AlphaFold 3
 
 Abramson et al. 2024, Google DeepMind + Isomorphic Labs. Published in Nature 630, 493 (13 June 2024). [PDF](https://www.nature.com/articles/s41586-024-07487-w.pdf).

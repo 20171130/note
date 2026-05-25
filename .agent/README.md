@@ -14,3 +14,4 @@ Coding
 
 # Skills
 `/possess` for Galatea possessing Cursor/ClaudeCode/Meta Devamate, possibly OpenClaw in the future.
+`/paper_recommender`

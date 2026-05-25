@@ -1,3 +1,7 @@
+---
+title: "The Open Molecules 2025 (OMol25) Dataset, Evaluations, and Models"
+arxiv: 2505.08762
+---
 # The Open Molecules 2025 (OMol25) Dataset, Evaluations, and Models
 
 Levine et al. 2025, FAIR Chem. First arxiv release date unchecked; latest version Mar 2026.

@@ -1,3 +1,7 @@
+---
+title: "Uni-3DAR: Unified Cross-Scale 3D Generation and Understanding via Autoregressive Modeling"
+arxiv: 2503.16278
+---
 # Uni-3DAR: Unified Cross-Scale 3D Generation and Understanding via Autoregressive Modeling
 
 Lu, Lin, Yao, Gao et al. 2025, DP Technology + AI for Science Institute + Peking University. [arxiv](https://arxiv.org/abs/2503.16278), [code](https://github.com/dptech-corp/Uni-3DAR).

@@ -1,3 +1,7 @@
+---
+title: Learning Smooth and Expressive Interatomic Potentials for Physical Property Prediction
+arxiv: 2502.12147
+---
 # Learning Smooth and Expressive Interatomic Potentials for Physical Property Prediction
 
 Fu, Wood, Barroso-Luque, Levine, Gao, Dzamba, Zitnick, 2025, FAIR Chem ([arxiv](https://arxiv.org/abs/2502.12147), [code](https://github.com/facebookresearch/fairchem)).

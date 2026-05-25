@@ -1,3 +1,7 @@
+---
+title: How Simple Can You Go? An Off-the-Shelf Transformer Approach to Molecular Dynamics
+arxiv: 2503.01431
+---
 # How Simple Can You Go? An Off-the-Shelf Transformer Approach to Molecular Dynamics
 
 Eissler, Korjakow, Ganscha, Unke, Müller, Gugler, 2025. TU Berlin / BIFOLD + Korea U + MPI-Informatics + Google DeepMind. [arxiv](https://arxiv.org/abs/2503.01431).

@@ -1,3 +1,7 @@
+---
+title: The Wisdom of Hindsight Makes Language Models Better Instruction Followers
+arxiv: 2302.05206
+---
 # The Wisdom of Hindsight Makes Language Models Better Instruction Followers
 
 The paper martin sent me is highly relevant, using RL for instruction following! RL for language modeling, with the help of hindsight. Hindsight instruction relableing is inspired by hindsight experience replay (HER) for goal-conditioned RL. 

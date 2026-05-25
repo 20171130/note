@@ -1,3 +1,7 @@
+---
+title: "我的 Agent 系统：职业长者 + 长期秘书 (Wu Mingdong's essay, friend)"
+skip: unindexed
+---
 > 吴铭东给我的他的agent系统的设计
 
 # 我的 Agent 系统：职业长者 + 长期秘书

@@ -1,3 +1,5 @@
+see also [tools](tools.md)
+
 # Everyday kit (gallon bags)
 - cleaning: shaver, nail clippers, ear pick, cotton swabs, nose hair scissors
 - dental: toothbrush, toothpaste, water floss, floss, mouthwash

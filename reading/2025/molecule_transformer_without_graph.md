@@ -1,3 +1,7 @@
+---
+title: Transformers Discover Molecular Structure Without Graph Priors
+arxiv: 2510.02259
+---
 # Transformers Discover Molecular Structure Without Graph Priors
 
 (https://arxiv.org/pdf/2510.02259)
