@@ -8,6 +8,7 @@ Postmortem hindsight analysis (critic) is separated from execution (actor and us
 The actor runs tasks and dumps raw experience to `log/`; Henry writes log and knowledge directly; the critic (this skill) distills both into the knowledge base.
 
 # Check the Updates
+First `.agent/skills/learn/scripts/learn.sh --pull` to fast-forward both the current branch and the `learner-baseline` (marker of the commit of the last scan) from the remote.
 Run `.agent/skills/learn/scripts/learn.sh --files` to list files changed since the last scan, or without `--files` for the full diff.
 Uncommitted work is excluded by default; add `--include-wip` to preview it.
 For each diff, read the surrounding text and referenced links to understand the context, then apply the steps below to integrate the new experience into the knowledge base.
@@ -49,7 +50,7 @@ This also applies to long-term goals, so open a task for Henry to discuss his re
 
 When you see a task, make sure it has sensible timestamps and is properly scheduled. Every task must have a scheduled or due date so it can be reviewed or rescheduled — a vague wishlist item is better off deleted than left to be procrastinated indefinitely.
 
-# Commit and Sync
-After consolidating, commit once the user approves your edits, then run `.agent/skills/learn/scripts/learn.sh --mark` to record the new baseline. The baseline is stored as the git branch `learner-baseline` so it syncs via push/pull.
-Use the `/possess` skill to sync and apply any updates to `rules` and `skills`.
+# Commit and Push
+After consolidating, commit once the user approves your edits.
+Run `.agent/skills/learn/scripts/learn.sh --push` to mark HEAD as the new `learner-baseline`, push the current branch and the marker, then possess Devmate + Claude at `$HOME` and Cursor at the note repo so `rules` and `skills` are applied everywhere.
 Remind Henry to learn from the new lessons as well.

@@ -4,13 +4,14 @@ alwaysApply: true
 ---
 Index of the other rules.
 
+# User
+basic information, preferences, interaction framework
 
 # Actor
 - communication
 - fact finding
 - planning
 - logging
-
 
 # Specific Rules
 Read these when relevant:
