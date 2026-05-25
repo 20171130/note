@@ -34,6 +34,8 @@ If a claim lacks support: when it is Henry's, leave the text and flag inline `[^
 
 Before doing anything complex, write down the plan to today's log and ask the user for audit and approval.
 
+Filter plans and lists to items that need Henry's input. Do trivial fixes (typos, grammar, formatting) silently. Do not enumerate no-ops, "leave as-is" items, or items already decided — they waste Henry's attention.
+
 # Logging
 Your session context is volatile. Write down anything you learn that may be needed in the future.
 After each non-trivial / challenging subtask, append to your log.

@@ -1,6 +1,6 @@
 ---
 name: learn
-description: Distill recent experience into knowledge, rules, and skills.
+description: Distill recent experience into knowledge, rules, and skills. Offloaded to a separate agent.
 ---
 
 For an agent, writing is in-context learning.
@@ -16,8 +16,8 @@ For each diff, read the surrounding text and referenced links to understand the 
 New experiences are dumped to `log/` by the actors; entries are append-only and immutable.
 Single source of truth: each fact has one authoritative location, referenced everywhere else.
 The log is the source of truth for events — what happened, when, in what context, including dead ends. The knowledge base is the source of truth for knowledge — durable lessons stripped of contingent context, derived from events.
+Duplicate records should be replaced by reference to the source of truth.
 Once events accumulate, distill from the log into the knowledge base: put factual knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project); put behavior learning in `rules/` or `skills/`. Keep insignificant or one-off lessons in the day's log.
-After consolidating, replace originals with references.
 
 # Fix
 First review (Fact Finding); flag conflicts and remove inaccurate or outdated information.

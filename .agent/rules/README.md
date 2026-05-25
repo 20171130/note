@@ -2,7 +2,7 @@
 description: Index portal for rules and skills.
 alwaysApply: true
 ---
-Index of the other rules. Rules apply to both the agent and the human.
+Index of the other rules.
 
 
 # Actor
