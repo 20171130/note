@@ -9,18 +9,7 @@ What is the minimum prior such a transformer needs? A spectrum of increasingly s
 3. Invariance — separating direction and distance, e.g. RBFs over pairwise distances, or attention biases conditioned on |r_ij|
 4. Equivariant representation — irreps, e3nn-style tensor products (e.g. MACE, NequIP, Allegro, eSEN)
 
-
-# On the representation and generation of real numbers and vectors
-
-Three families exist for emitting a real number from a transformer. Continuous heads commit to a distribution family: MSE (a fixed-variance Gaussian; Bishop 1994 showed mean-collapse on multi-modal targets), heteroscedastic Gaussian, MDN (fragile training), or modern per-token diffusion (MAR[^mar], AF3[^af3]) and Gaussian mixture (GIVT[^givt]) heads. They cost a separate denoiser or distribution-fitting machinery and a loss-weight against the cross-entropy on text. Naive subword/digit tokenization (Regression Transformer, LIFT[^lift]) embeds floats as text — sequence length blows up, bin adjacency is lost. One-token-per-quantile-bin (molxformer[^molxformer], Chronos[^chronos], WaveNet) keeps sequences compact and unifies the loss but ignores ordinality on the bin vocab; Token-Mol[^tokenmol] patches this with a Gaussian Cross-Entropy soft label centered on the true bin, and residual-codebook stacks (VQ-VAE[^vqvae], RQ-Transformer[^rqt], EnCodec[^encodec]) replace one bin with K codebook indices emitted by a per-slot inner AR head. For 3D coordinates the geometric variant is octree subdivision (Uni-3DAR[^uni3dar] at the outer sequence; VAR[^var] as next-scale prediction).
-
-Each predecessor leans on data assumptions we want to drop. molxformer/Token-Mol fix a global bin grid (assumes targets have a known range and roughly uniform density across it). MDN and GIVT pick K modes a priori (assumes the distribution's shape). RQ-Transformer learns a codebook (assumes the training distribution covers the regions a learned codebook can find). Uni-3DAR assumes a canonical BFS ordering of points (assumes the input data is sparse, locally clustered, and order-invariant) and tokenizes only coordinates, not arbitrary continuous payloads. MAR's diffusion head needs a noise schedule tuned to the target's scale.
-
-Our Continuous Token Transformer drops all of these: no sparsity, no locality, no fixed magnitude range, no codebook to learn, no distribution family, no permutation-invariance assumption. We assume only that each value is a double (and it's easy to support unbounded precision if ever necessary). Cross-entropy is the single loss across text, scalars, and vectors, with no coefficient to balance.
-
 # On the Necessity of Equivariance and Locality
-
-Empirical question: how far up this spectrum must one go to match equivariant baselines, and where does scaling compensate for missing priors?
 
 Strict equivariance is genuinely being abandoned. Within MLIP GNNs, multiple 2024–2025 papers (Orb[^orb], EScAIP[^escaip], PET-MAD[^petmad]) drop hard E(3)-equivariance but keep a spatial graph (radial cutoff) and recover competitive accuracy with more data. This is solid emerging practice.
 
@@ -39,6 +28,19 @@ This is the underlying tradeoff: a pair representation with triangular updates b
 Dropping equivariance simplifies the architecture, aligns better with LLM stacks, and assumes less about the data. OMol25[^omol25] is the standing caveat: careful treatment of smoothness and energy conservation remains necessary for MD and downstream tasks. One way out is to skip MD integration altogether and predict future directly instead (possibly with CoT). Symmetry is dominant for fundamental physics but loses its lofty status as we move toward larger-scale, coarse-grained, approximate models.
 
 Counter-evidence with caveats: Vadgama et al. 2025[^vadgama], under controlled head-to-head comparison, find equivariant models still beat unconstrained ones on QM9 / ShapeNet / CMU motion, and capacity scaling does not close the gap. But all comparisons are within Rapidash, a regular group-conv architecture — no transformer baseline is tested — and the scaling ablation is a single pair of hidden-dim sizes (256 vs 512), under one order of magnitude. So the result is "more equivariance beats less equivariance, within group convs, at small data", not yet a refutation of the molxformer / AF3 bet of "drop equivariance, switch to large pretrained transformer, scale data". The open question — whether the gap closes once you change both architecture family and data regime — is not addressed.
+
+# On the representation and generation of real numbers and vectors
+
+Three families exist for emitting a real number from a transformer.
+Naive subword/digit tokenization (Regression Transformer, LIFT[^lift]) embeds floats as text — sequence length blows up, bin adjacency is lost.
+Continuous heads commit to a distribution family: MSE (a fixed-variance Gaussian; Bishop 1994 showed mean-collapse on multi-modal targets), heteroscedastic Gaussian, MDN (fragile training), or modern per-token diffusion (MAR[^mar], AF3[^af3]) and Gaussian mixture (GIVT[^givt]) heads. They cost a separate denoiser or distribution-fitting machinery and a loss-weight against the cross-entropy on text.
+One-token-per-quantile-bin (molxformer[^molxformer], Chronos[^chronos], WaveNet) keeps sequences compact and unifies the loss but ignores ordinality on the bin vocab; Token-Mol[^tokenmol] patches this with a Gaussian Cross-Entropy soft label centered on the true bin, and residual-codebook stacks (VQ-VAE[^vqvae], RQ-Transformer[^rqt], EnCodec[^encodec]) replace one bin with K codebook indices emitted by a per-slot inner AR head. For 3D coordinates the geometric variant is octree subdivision (Uni-3DAR[^uni3dar] at the outer sequence; VAR[^var] as next-scale prediction).
+
+Each predecessor leans on data assumptions we want to drop. molxformer/Token-Mol fix a global bin grid (assumes targets have a known range and roughly uniform density across it). MDN and GIVT pick K modes a priori (assumes the distribution's shape). RQ-Transformer learns a codebook (assumes the training distribution covers the regions a learned codebook can find). Uni-3DAR assumes a canonical BFS ordering of points (assumes the input data is sparse, locally clustered, and order-invariant) and tokenizes only coordinates, not arbitrary continuous payloads. MAR's diffusion head needs a noise schedule tuned to the target's scale. MegaByte[^megabyte] is the one prior work that drops all of these assumptions — but goes too far for us by replacing the subword text tokenizer, which gives up compatibility with pretrained text LLMs. It is a model for all digital data, while we want a model for text and numbers specificly.
+
+Our Continuous Token Transformer drops all of these assumptions for numerical values only, while keeping subword tokenization for text intact so we can initialize from a pretrained LLM: no sparsity, no locality, no fixed magnitude range, no codebook to learn, no distribution family, no permutation-invariance assumption. We assume only that each value is a double (and it's easy to support unbounded precision if ever necessary). Cross-entropy is the single loss across text, scalars, and vectors, with no coefficient to balance.
+
+
 
 # Read List
 
@@ -97,6 +99,17 @@ See [reading note](../../reading/2024/alphafold3.md).
 Outbound links: AF2, IPA, Evoformer, Pairformer, molxformer, ADiT.
 
 
+# 2023
+
+### megabyte_2023
+Title: MEGABYTE: Predicting Million-byte Sequences with Multiscale Transformers[^megabyte]
+Meta AI (Yu, Simig, Zhang, Lin, Fan, Lewis, Ghazvininejad). NeurIPS 2023.
+Multi-scale byte-level LM: a *global* decoder transformer runs over patch embeddings (P consecutive bytes concatenated into one embedding, P ≈ 4–8); a small *local* decoder transformer takes the global model's next-patch embedding as a prefix and autoregressively emits the P bytes of the next patch. Reduces the global sequence length by a factor of P while keeping byte-level precision. Single 256-symbol vocabulary across modalities — raw UTF-8 for text, raw RGB bytes for images, raw PCM for audio — no per-modality tokenizer. Earliest clean LM-scale instance of the "outer transformer + inner AR head per slot" factorization, and a direct precedent for replacing a learned codebook with a canonical fixed alphabet (CTT does the same with IEEE 754 bits).
+MegaByte is too radical for our purpose: replacing the text tokenizer with raw bytes gives up compatibility with existing pretrained LLMs. CTT applies the same outer + inner AR factorization only to numerical tokens, keeping subword tokenization for text intact, so we can stand on the shoulders of giants and initialize from a pretrained LLM.
+
+Outbound links: RQ-Transformer, CTT, Moshi, Perceiver IO.
+
+
 # Closest Related Work — Transformers on 3D Coordinates
 
 Ordered by how much physics/graph prior is kept.
@@ -145,9 +158,11 @@ Discrete spatial tokenization:
 - VQ-VAE (van den Oord et al. 2017)[^vqvae] — learned discrete codebook over continuous embeddings; foundation for the VQ→AR-token pipeline used widely in image/audio.
 
 Per-slot inner AR head (closest architectural family to the Continuous Token Transformer design):
-- RQ-Transformer (Lee et al. 2022)[^rqt] — residual VQ with a small "depth transformer" per outer slot that autoregressively emits a stack of codebook indices. Direct precedent for in-token AR over discrete codes.
-- SoundStream / EnCodec (Zeghidour et al. 2021 / Défossez et al. 2022)[^encodec] — residual-VQ neural audio codec; same depth-stack tokenization that downstream audio LMs (AudioLM, MusicGen) decode via per-slot AR heads.
+- RQ-Transformer (Lee et al. 2022)[^rqt] — residual VQ with a small "depth transformer" per outer slot that autoregressively emits a stack of codebook indices. Direct precedent for in-token AR over discrete codes. See [reading note](../../reading/2022/rq-vae.md).
+- MegaByte (Yu et al. 2023, Meta)[^megabyte] — multi-scale byte-level LM. A *global* transformer runs over patch embeddings (one embedding per P consecutive bytes, P ≈ 4–8); a *local* transformer takes the global model's next-patch embedding as context and autoregressively emits the P bytes inside the patch. Earliest clean instance of the "outer transformer + inner AR head per slot" factorization at LM scale; alphabet is raw bytes rather than a learned codebook. They use raw UTF-8 / RGB / PCM bytes (single 256-vocab) uniformly across text, images, and audio — no per-modality tokenizer — which is the same "drop tokenization assumptions" stance CTT takes for numerical values.
+- SoundStream / EnCodec (Zeghidour et al. 2021 / Défossez et al. 2022)[^encodec] — residual-VQ neural audio codec; same depth-stack tokenization that downstream audio LMs (AudioLM, MusicGen, Moshi) decode via per-slot AR heads.
 - VAR (Tian et al. 2024)[^var] — "next-scale" prediction; coarse-to-fine generation over outer-sequence positions rather than an inner head, but the same coarse-to-fine philosophy applies.
+- MAR (Li et al. 2024)[^mar] — same "no learned codebook" philosophy, but the per-slot head is a diffusion sampler over a continuous embedding rather than a depth AR; complementary alternative to CTT's bit-AR head. Also listed above under continuous distribution heads.
 
 
 [^molxformer]: <https://arxiv.org/abs/2510.02259>
@@ -176,6 +191,7 @@ Per-slot inner AR head (closest architectural family to the Continuous Token Tra
 [^vqvae]: van den Oord et al. 2017, "Neural Discrete Representation Learning." NeurIPS. <https://arxiv.org/abs/1711.00937>
 [^uni3dar]: Lu et al. 2025, "Uni-3DAR: Unified 3D Generation and Understanding via Autoregressive Modeling on Compressed Spatial Tokens." DP Technology. <https://arxiv.org/abs/2503.16278>
 [^rqt]: Lee et al. 2022, "Autoregressive Image Generation using Residual Quantization." CVPR. <https://arxiv.org/abs/2203.01941>
+[^megabyte]: Yu et al. 2023, "MEGABYTE: Predicting Million-byte Sequences with Multiscale Transformers." NeurIPS. <https://arxiv.org/abs/2305.07185>
 [^encodec]: Défossez et al. 2022, "High Fidelity Neural Audio Compression" (EnCodec); Zeghidour et al. 2021, "SoundStream: An End-to-End Neural Audio Codec." <https://arxiv.org/abs/2210.13438>
 [^var]: Tian et al. 2024, "Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction." NeurIPS best paper. <https://arxiv.org/abs/2404.02905>
 [^tokenmol]: Wang et al. 2024, "Token-Mol 1.0: tokenized drug design with large language models." <https://arxiv.org/abs/2407.07930>

@@ -66,6 +66,7 @@ Core idea is settled (continuous-token AR, octree inner head, drop equivariance,
 
 1. Continuous-input embedding. xVal-style single token with value-scaled embedding, vs Fourier features at multiple frequencies, vs MLP encoder over the raw value. Trade compactness vs smoothness.
 2. Inner head architecture. Per-step MLP (cheapest), mini-transformer over the K-step inner sequence (most expressive, like RQ's depth transformer), or shared head with explicit step-position embedding.
+3. should we generate per bit or per byte? for vectors, generate 3 dimensions together for each level of precision, or one by one?
 
 
 # [Related Work](/knowledge/ai/survey_3d_priors.md)
