@@ -1,15 +1,84 @@
-# TODO
-Continuous Token Transformer
+# TODO and Progress
+1. ✅ test how to manage python env and submit gpu jobs on [fair sc3](/knowledge/fair-sc.md)
+2. ~~Download OMol25 data~~ — already on cluster, see [below](#omol25-on-disk). Still TODO: deeper statistics on raw shards.
+3. ✅ Eval a baseline method for sanity check on OMol25 — done, see [below](#baseline-sanity-eval--passed-2026-05-24-2235-pdt). Within 11-16% of paper on energy/force.
 
-Think more carefully about architecture, training data, and evaluation tasks.
+4. implement continous token transformer, the tokenizer, embedding, and decoder head.
+5. answer the design questions, compare against molxformer
 
-Brandon:
-1. How to fight catastrophic forgetting? Perhaps make it closer to vanilla transformer so I can use LoRA?
-Besides architecture, another problem is data, and it's a huge problem.
+## OMol25 on disk
 
-Also on evaluation, what task is optimal for demonstrating our motivation? The best task may be something with little data so few/zero shot generalization is preferred, or some tasks that involve inherent ambiguity in its specification so the flexibility of text is needed.
+Path: `/checkpoint/ocp/shared/omol/250430-release/` (mirror `/checkpoint/ocp-h100-2/shared/omol/250409-final/`, older).
 
-Naming note: "Continuous Tokens" is the headline phrase of Fluid (Fan et al. 2024, "Scaling Autoregressive Text-to-image Generative Models with Continuous Tokens"), and MAR / GIVT cluster around the same terminology. Frame this work as the discrete-octree-head variant within that family rather than as a new line — the differentiator is the inner-AR octree subdivision head, not the umbrella term.
+Splits group into three families. Structure counts marked "est." are `entries_in_shard0 × n_shards`, an upper bound since the last shard may be partial; cited counts come from the paper.
+
+| family | split | shards | size | structures | sources (sampled[^direct_probe]) | charge | spin | role |
+|---|---|---|---|---|---|---|---|---|
+| train | `train` | 200 | 509 GB | est. 105 M[^count_discrepancy] | elytes, biomolecules, geom, orbnet, … | -1..+3 | 1..4 | full training ("All")[^omol25_table1] |
+| train | `train_4M` | 80 | 22 GB | 4.0 M | all 10 OMol25 sources | -2..+3 | 1..6 | uniform subsample for cheap dev[^omol25_table1] |
+| train | `simple_train` | 80 | 109 GB | est. 34.3 M | ani2x, geom, trans1x, spice, orbnet, rgd | 0 only | 1 only | "Neutral" subset[^omol25_neutral] |
+| train | `simple_val` | 80 | 135 MB | est. 28 k | orbnet, geom, ani2x, spice | 0 only | 1 only | validation for `simple_train` |
+| comp-OOD | `val` | 80 | 23 GB | 2.76 M | elytes, biomolecules | -3..+3 | 1 | OOD-by-composition val ("Val Comp")[^omol25_table1] |
+| comp-OOD | `test` | 80 | 25 GB | 2.81 M | biomolecules, elytes | -3..+3 | 1..2 | OOD-by-composition test ("Test Comp")[^omol25_table1] |
+| chem-OOD | `elytes_ood` | 80 | 553 MB | est. 124 k | elytes only | -2..+1 | 1 | electrolyte clusters with OOD anions/cations/solvents[^omol25_elyte] |
+| chem-OOD | `metal_ligand_ood` | 80 | 358 MB | 42 k[^omol25_table1] | metal_complexes only | -2..+3 | 1..8 | 50 held-out metal–ligand bond combos ("M-Lig") |
+| chem-OOD | `uhs_ood` | 80 | 161 MB | est. 25 k | elytes, metal_complexes | -8..+6 | 12..21 | ultra high-spin OOD (charge & spin extremes)[^uhs_probe] |
+
+[^direct_probe]: Per-frame metadata read directly from shard 0 of each split (`data.data_id`, `data.charge`, `data.spin`, 50-record sample). Records are zlib-compressed JSON inside ASE-LMDB.
+[^count_discrepancy]: Paper Table 1 reports 140,641,161 for "All"; our 200 × 525,507 estimate gives ~105 M. Either the per-shard count varies, or the on-disk release is a different cut. Not yet investigated.
+[^omol25_table1]: Levine et al. 2025 Table 1, [`reading/2025/omol25.md`](../reading/2025/omol25.md). Counts: All 140,641,161; 4M 3,986,754; Val Comp 2,762,021; Test Comp 2,805,046; M-Lig val 39,615 / test 42,028.
+[^omol25_neutral]: Paper §2.9: "Neutral" split = 34,335,828 charge-neutral singlet snapshots from ANI-2X, OrbNet Denali, SPICE2, GEOM, Transition-1X, RGD1. Per-shard probe matches both the count (~34.3 M) and source composition.
+[^omol25_elyte]: Paper §K.4 / Table 14: OOD electrolyte clusters built from held-out anions (e.g. DFOB, HMDS), cations (e.g. TMA, tetraethylphosphonium), and/or solvents.
+[^uhs_probe]: Probed shard 0 records show spin multiplicities of 12, 13, 14, 15, 16, 17, 19, 21 — i.e. extremely open-shell — and absolute charges up to 8. Confirms "ultra high spin" interpretation. Not defined in arXiv:2505.08762 v1 or fairchem `main` configs; canonical name binding only in the gated HF DATASET.md.
+
+Precomputed stats in `stats/` (built on a 10.65M-frame subsample, ~538M atoms; OMol25 paper reports ~140M total structures, so this is roughly a 1:13 sample[^stats_sample]):
+
+- `stats.pkl`: `energy_mean=1.94 eV`, `energy_std=9.67 eV`, `force_rms=1.43 eV/Å`, `force_md=1.17 eV/Å` (force mean magnitude), `avg_num_atoms=50.5`.
+- `energy_histogram.npz` — 100 bins over `[-87.3, 254.5] eV` (after lin-ref subtraction). Per-frame percentiles: p1 −17, p50 −0.15, p99 +34, p99.9 +78, all in eV. Heavy right tail.
+- `force_norm_histogram.npz` — 100 bins over `[5e-8, 50] eV/Å`. Per-atom percentiles: p50 0.75, p95 3.75, p99 10.25, p99.9 26.75, all in eV/Å. Forces span ~9 orders of magnitude; needs log-scale handling for the in-token AR head.
+- `lin_ref_coeffs_hof.npz` — per-element heat-of-formation reference, 100 atomic numbers, range `[-3.19, 18.36] eV/atom`.
+- `joint_hof_lin_coeffs.npz` — full energy reference, range `[-74932, 0] eV/atom` (raw DFT total energies before subtraction).
+
+[^stats_sample]: Inferred from `hist.sum()=10.65M` frames vs the 140M figure in [OMol25 paper](../reading/2025/omol25.md). The histogram file itself does not document its sampling protocol.
+
+
+## Baseline sanity eval — PASSED 2026-05-24 22:35 PDT
+
+Goal: load a released eSEN-sm-conserving checkpoint, run inference on `val/data0000.aselmdb`, reproduce the paper's MAE within sanity bounds. Confirms data path + units are right before any model dev.
+
+Result on 500 structures from `val/data0000`:
+
+| metric | ours | paper Test-Comp eSEN-sm-cons All[^paper_table3] | gap |
+|---|---|---|---|
+| energy MAE | 1.913 kcal/mol | 2.150 kcal/mol | -11% (better) |
+| force MAE | 0.198 kcal/mol/Å | 0.170 kcal/mol/Å | +16% (worse) |
+| wall | 30.7 s, 0.06 s/struct on 1 H100 | — | — |
+
+Both within 20% on a single shard. Shard 0 is elytes+biomolecules-heavy and we ran on Val-Comp (not Test-Comp), so directional differences are expected sample bias. Data path verified, units correct.
+
+Stack: `mlip-pytorch-2.8.0-cu126.sif` + `~/envs/mlip/` (fairchem-core 2.20.0) + HF gated access. Launch via `apptainer exec --nv` under `srun --qos=h100_dev --gres=gpu:1`.
+
+Unit-convention note: paper Table 3 reports energy MAE in kcal/mol **per structure** (not per-atom; the table footer says just "kcal/mol", no "/atom"). Force MAE is per-atom (kcal/mol/Å). Easy to misread because the page-12 prose says "per-atom MAE is the primary metric" — that applies to forces only.
+
+Local 4M checkpoints (`omol_checkpoints/202505-0117-5120-e475/inference_ckpt_final.pt`) remain unusable from public fairchem-core because they require `fairchem.experimental.foundation_models` (internal Meta package, has the `puma.escn_md` backbone, not on PyPI). To reproduce the 4M Table 3 row (3.250 / 0.230), need to either:
+- get internal `fairchem.experimental` from Brandon Wood / Muhammed Shuaibi / Saro Passaro, or
+- accept the All row (2.150 / 0.170) we've already reproduced — All is the stronger model and a fair sanity target.
+
+Scripts (all under `~/work/omol25_eval/`):
+- `eval_baseline.py` — main eval, supports `--limit N --verbose`.
+- `scripts/pull_mlip_sif.sh` — one-time apptainer SIF pull.
+- `scripts/setup_mlip_apptainer.sh` — install fairchem-core into `~/envs/mlip/` via PYTHONUSERBASE.
+
+Plan: [`~/.llms/plans/omol25_baseline_sanity_eval.plan.md`](/home/hangrui/.llms/plans/omol25_baseline_sanity_eval.plan.md). Env design: [fair-sc.md](/knowledge/fair-sc.md#python-environments).
+
+[^paper_table3]: Levine et al. 2025 Table 3 (p. 12) and Table 4 (p. 13). Two release columns reported — "OMol-0" (original) and "OMol-1" (refined). Released registry ckpt `esen-sm-conserving-all-omol` matches the OMol-0 row.
+
+## Minor design questions
+Core idea is settled (continuous-token AR, octree inner head, drop equivariance, multimodal text-vector interleaving); the following details are still open and should be resolved (RQ-Transformer read will inform several):
+
+1. Continuous-input embedding. xVal-style single token with value-scaled embedding, vs Fourier features at multiple frequencies, vs MLP encoder over the raw value. Trade compactness vs smoothness.
+2. Inner head architecture. Per-step MLP (cheapest), mini-transformer over the K-step inner sequence (most expressive, like RQ's depth transformer), or shared head with explicit step-position embedding.
+3. should we generate per bit or per byte? for vectors, generate 3 dimensions together for each level of precision, or one by one?
 
 # History
 Originally I designed a transformer for MD trajectories.
@@ -18,6 +87,8 @@ Then I changed it to a generative equivariant transformer.
 Brandon and Ray suggested we can drop equivariance entirely.
 Then after reading uni3dar_2025, recommended to me by Aaron, I invented in-token autoregressive generation for sampling numerical values and vectors.
 Then the idea was generalized to the Continuous Token Transformer.
+
+Naming note: "Continuous Tokens" is the headline phrase of Fluid (Fan et al. 2024, "Scaling Autoregressive Text-to-image Generative Models with Continuous Tokens"), and MAR / GIVT cluster around the same terminology. Frame this work as the discrete-octree-head variant within that family rather than as a new line — the differentiator is the inner-AR octree subdivision head, not the umbrella term.
 
 # Motivation
 
@@ -60,13 +131,6 @@ For a 3D vector, replace `<scalar_token>` with `<vector_token>` and emit all thr
 Compression: multiple bit-levels can be packed into one inner subtoken (e.g. `2^16 = 65536` sub-vocab states sampling 4 times for a double), trading inner-step count for a wider per-step vocab. Not performance-critical since the inner head is light-weight.
 
 Source: [continuous_token_head.d2](../image/continuous_token_head.d2) — render with `d2 --layout elk continuous_token_head.d2 continuous_token_head.svg`.
-
-## Minor design questions
-Core idea is settled (continuous-token AR, octree inner head, drop equivariance, multimodal text-vector interleaving); the following details are still open and should be resolved (RQ-Transformer read will inform several):
-
-1. Continuous-input embedding. xVal-style single token with value-scaled embedding, vs Fourier features at multiple frequencies, vs MLP encoder over the raw value. Trade compactness vs smoothness.
-2. Inner head architecture. Per-step MLP (cheapest), mini-transformer over the K-step inner sequence (most expressive, like RQ's depth transformer), or shared head with explicit step-position embedding.
-3. should we generate per bit or per byte? for vectors, generate 3 dimensions together for each level of precision, or one by one?
 
 
 # [Related Work](/knowledge/ai/survey_3d_priors.md)

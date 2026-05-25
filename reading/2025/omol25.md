@@ -9,7 +9,16 @@ Levine et al. 2025, FAIR Chem. First arxiv release date unchecked; latest versio
 ## Dataset
 ~140M DFT calculations at the ωB97M-V/def2-TZVPD level of theory, systems up to 350 atoms, billions of CPU core-hours. Molecules only — isolated systems with explicit solvation, no periodic boundary conditions. FAIR Chem's PBC datasets (OC20 catalysts, OC22 oxides, OMat24 materials) are separate. Coverage spans small molecules, biomolecules, metal complexes, and electrolytes; varying charge and spin; 83 elements.
 
+## On-disk format (FAIR-SC release)
+
+Each split is 80–200 `*.aselmdb` shards. A shard is a plain LMDB with integer-string keys (`b'1'`, `b'2'`, …); each value is `zlib.compress(json.dumps(record))`. No fairchem install needed to read — `lmdb` + `zlib` + `json` is enough.
+
+The record is an ASE-dict with the usual `numbers`, `positions`, `cell`, `energy`, `forces` at the top, and the OMol-specific fields under `record["data"]`: `data_id` (source dataset, e.g. `ani2x`, `metal_complexes`, `elytes`, `biomolecules`, `geom_orca6`, `orbnet_denali`, `spice`, `trans1x`, `rgd`, `reactivity`), `charge`, `spin` (multiplicity), `num_atoms`, `composition`, plus DFT details (`n_scf_steps`, `homo_lumo_gap`, Mulliken/Löwdin/NBO charges, etc.).
+
+See [work/multimodal.md](../../work/multimodal.md#omol25-on-disk) for per-split statistics from this dataset on `fair-sc-3`.
+
 ## Baselines
+
 eSEN, GemNet-OC, MACE, UMA — all message-passing GNNs where nodes are atoms and edges are neighbor interactions.
 
 ## Findings

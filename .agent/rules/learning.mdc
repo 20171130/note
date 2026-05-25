@@ -6,10 +6,10 @@ alwaysApply: true
 Your session context is volatile. Write down anything you learn that may be needed in the future.
 We maintain a knowledge base in `note/`, read them when relevant.
 [`log`](log/YYYY-MM-DD.md) contains daily activities.
-Resuable knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project).
+Reusable knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project).
 
 # Logging
-After each non-trivial / challenging subtask, append to `log/YYYY-MM-DD.md` under `# Galatea's Log`.
+After each non-trivial / challenging subtask, append to `# Galatea's Log` in `log/YYYY-MM-DD.md`. This heading is always the last section; if absent, create it at the bottom — never above existing content.
 Log if and only if you learn new information from this experience.
 Do not include prior knowledge you already know before the session.
 Include start & end timestamp with timezones.
@@ -23,7 +23,9 @@ Learn from demonstrations: when Henry corrects me orally or edits anything I wri
 Identify learning signals and record them with logging.
 
 # Consolidation
-After Henry reviews my log, he may ask me to [normalize](writing.mdc) it.
-Put factual knowledge in `knowledge/`, `work/`, or `reading/`.
-Put behavior learning in `rules/` or `skills/`.
+After Henry reviews my log, he may ask me to [normalize](writing) it.
+If the learned lesson lacks generalization potential or significance, keep it in the day's log. Otherwise:
+- Put factual knowledge in `knowledge/`, `work/`, or `reading/`.
+- Put behavior learning in `rules/` or `skills/`.
+
 Keep `rules/` and `skills/` concise: update them only for new rules or patterns. If an existing rule failed, repeating it does not help.
