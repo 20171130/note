@@ -50,8 +50,8 @@ Rules use Markdown with YAML frontmatter:
 description: Writing style for text documents
 alwaysApply: true
 include_rule:
-  - ./core.mdc
-  - ./reasoning.mdc
+  - ./core.md
+  - ./reasoning.md
 ---
 ```
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Derive assistant-specific customization files from a canonical .agent tree.
 
-.agent is the source DSL. Rules are Cursor-compatible .mdc files with
-`description`, Cursor's `alwaysApply`, and the portable `include_rule` list.
+.agent is the source DSL. Rules are Markdown files with `description`,
+Cursor's `alwaysApply`, and the portable `include_rule` list.
 Skills are directories under .agent/skills/<name>/ containing SKILL.md (and
 optionally a scripts/ subdirectory). Both rules and skills may carry
 `include_rule`; included non-global rules are inlined depth-first before the
@@ -14,11 +14,11 @@ user-level file-based rules, so per-project layout is the canonical convention
 for every target:
 
   <target>/.llms/rules/*.md and <target>/.llms/skills/<name>/   (Devmate;
-      location is the always-apply signal, so `alwaysApply` is omitted and
-      .mdc is converted to .md).
+      location is the always-apply signal, so `alwaysApply` is omitted).
   <target>/.cursor/rules/*.mdc and <target>/.cursor/skills/<name>/   (Cursor;
       `description` and `alwaysApply` preserved on rules, .agent-only fields
-      such as `include_rule` stripped).
+      such as `include_rule` stripped; .md is renamed to .mdc since Cursor
+      requires that extension).
   <target>/.claude/CLAUDE.md plus <target>/.claude/commands/*.md   (Claude;
       rule bodies consolidated into one file, skill bodies become commands).
 """
@@ -37,7 +37,7 @@ from typing import Iterable
 
 
 FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
-RULE_LINK_RE = re.compile(r"\]\(\.\./\.\./rules/([^)#]+)\.mdc(#[-A-Za-z0-9_]+)?\)")
+RULE_LINK_RE = re.compile(r"\]\(\.\./\.\./rules/([^)#]+)\.md(#[-A-Za-z0-9_]+)?\)")
 
 
 def default_source() -> Path:
@@ -167,7 +167,7 @@ def atomic_write(path: Path, content: str, dry_run: bool) -> bool:
 
 
 def rules(source: Path) -> list[Path]:
-    return sorted((source / "rules").glob("*.mdc"))
+    return sorted((source / "rules").glob("*.md"))
 
 
 def skills(source: Path) -> list[Path]:
@@ -301,7 +301,7 @@ def sync(config: Config, dry_run: bool) -> list[str]:
             if atomic_write(devmate_target, devmate_text, dry_run):
                 changed.append(str(devmate_target))
         if do_cursor:
-            cursor_target = config.cursor / "rules" / rule.name
+            cursor_target = config.cursor / "rules" / f"{rule.stem}.mdc"
             expected_files.add(cursor_target)
             if atomic_write(cursor_target, cursor_rule_content(rule), dry_run):
                 changed.append(str(cursor_target))

@@ -1,5 +1,5 @@
 ---
-name: paper_recommender
+name: recommend_paper
 description: Chat-driven paper recommender. Invoke when user asks for paper suggestions, wants to reject a recommendation, or adds a new reading note.
 ---
 
@@ -47,7 +47,7 @@ Buffer is a queue, not a one-shot list — missing a day doesn't lose papers; ol
 ## Implementation — agent invokes on user's behalf
 
 ```bash
-python3 .agent/skills/paper_recommender/scripts/recommend_papers.py [flags]
+python3 .agent/skills/recommend_paper/scripts/recommend_papers.py [flags]
 ```
 
 | Flag | Default | Effect |
