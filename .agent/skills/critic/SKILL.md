@@ -9,6 +9,7 @@ Postmortem hindsight analysis (critic) is separated from execution (actor and us
 The actor runs tasks and dumps raw experience to `log/`; Henry writes to the log and knowledge directly; the critic (this skill) distills both into the knowledge base.
 
 # Check the Updates
+If specific content is mentioned, critique only that; otherwise critique the whole update.
 First `.agent/skills/critic/scripts/critic.sh pull` to rebase the current branch (with autostash) onto remote and fast-forward the `learner-baseline` (marker of the commit of the last scan).
 Run `.agent/skills/critic/scripts/critic.sh diff --name-only` to list files changed since the last scan, or `critic.sh diff` for the full diff.
 Uncommitted work is excluded by default; add `--include-wip` to preview it.
@@ -16,6 +17,7 @@ For each diff, read the surrounding text and referenced links to understand the 
 
 # [Review](actor#fact-finding)
 Check the update for consistency and completeness of the claims.
+If the log is about implementing code, review the code as well.
 Flag conflicts and remove inaccurate or outdated information.
 Logs are immutable; amendments should be appended, not modified in place.
 If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is yours, rewrite to match what you actually found.

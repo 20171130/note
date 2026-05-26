@@ -3,8 +3,7 @@
 2. ~~Download OMol25 data~~ — already on cluster, see [below](#omol25-on-disk). Still TODO: deeper statistics on raw shards.
 3. ✅ Eval a baseline method for sanity check on OMol25 — done, see [below](#baseline-sanity-eval--passed-2026-05-24-2235-pdt). Within 11-16% of paper on energy/force.
 
-4. implement continous token transformer, the tokenizer, embedding, and decoder head.
-5. answer the design questions, compare against molxformer
+This file is archived. Future docs live in the [Continuous Token Transformer repo](/CTT/README.md).
 
 ## OMol25 on disk
 
@@ -64,7 +63,7 @@ Local 4M checkpoints (`omol_checkpoints/202505-0117-5120-e475/inference_ckpt_fin
 - get internal `fairchem.experimental` from Brandon Wood / Muhammed Shuaibi / Saro Passaro, or
 - accept the All row (2.150 / 0.170) we've already reproduced — All is the stronger model and a fair sanity target.
 
-Scripts (all under `~/work/omol25_eval/`):
+Scripts (all under `~/CTT/omol25_eval/`):
 - `eval_baseline.py` — main eval, supports `--limit N --verbose`.
 - `scripts/pull_mlip_sif.sh` — one-time apptainer SIF pull.
 - `scripts/setup_mlip_apptainer.sh` — install fairchem-core into `~/envs/mlip/` via PYTHONUSERBASE.
@@ -72,13 +71,6 @@ Scripts (all under `~/work/omol25_eval/`):
 Plan: [`~/.llms/plans/omol25_baseline_sanity_eval.plan.md`](/home/hangrui/.llms/plans/omol25_baseline_sanity_eval.plan.md). Env design: [fair-sc.md](/knowledge/fair-sc.md#python-environments).
 
 [^paper_table3]: Levine et al. 2025 Table 3 (p. 12) and Table 4 (p. 13). Two release columns reported — "OMol-0" (original) and "OMol-1" (refined). Released registry ckpt `esen-sm-conserving-all-omol` matches the OMol-0 row.
-
-## Minor design questions
-Core idea is settled (continuous-token AR, octree inner head, drop equivariance, multimodal text-vector interleaving); the following details are still open and should be resolved (RQ-Transformer read will inform several):
-
-1. Continuous-input embedding. xVal-style single token with value-scaled embedding, vs Fourier features at multiple frequencies, vs MLP encoder over the raw value. Trade compactness vs smoothness.
-2. Inner head architecture. Per-step MLP (cheapest), mini-transformer over the K-step inner sequence (most expressive, like RQ's depth transformer), or shared head with explicit step-position embedding.
-3. should we generate per bit or per byte? for vectors, generate 3 dimensions together for each level of precision, or one by one?
 
 # History
 Originally I designed a transformer for MD trajectories.
@@ -88,49 +80,13 @@ Brandon and Ray suggested we can drop equivariance entirely.
 Then after reading uni3dar_2025, recommended to me by Aaron, I invented in-token autoregressive generation for sampling numerical values and vectors.
 Then the idea was generalized to the Continuous Token Transformer.
 
-Naming note: "Continuous Tokens" is the headline phrase of Fluid (Fan et al. 2024, "Scaling Autoregressive Text-to-image Generative Models with Continuous Tokens"), and MAR / GIVT cluster around the same terminology. Frame this work as the discrete-octree-head variant within that family rather than as a new line — the differentiator is the inner-AR octree subdivision head, not the umbrella term.
+Naming note: moved to [CTT/README.md#naming](../../CTT/README.md#naming).
 
 # Motivation
-
-A multimodal-native LLM, with chemistry as first-class citizen.
-
-![Reason in atoms](../image/reason_in_atoms.png)
-
-A model that can communicate with us, while thinking in a fundamentally non-linguistic way.
-
-Not a replacement for UMA — a complementary multitask, in-context learner.
-
-First class citizen: not as text, vision or tool calls, chemistry deserves its own proper representation. LLMs can summarize a paragraph, it should be able to create coarse grain model of a system. Reason in words, now it can reason in atoms as well. Mirroring the microscopic atomic world; analogous to ideas like "visual thinking", "spatial memory", "sixth sense".
+Moved to [CTT/README.md#motivation](../../CTT/README.md#motivation).
 
 # Architecture
-Each token can be a text token, a real number, or a vector.
-
-Following recent studies, equivariance is not necessary.
-Identical to a vanilla transformer, except for the embedding and prediction head for real numbers and vectors.
-
-Parameterization is compatible with the vanilla transformer — initialized from pretrained weights for free prior knowledge.
-
-For decoding, reserve a special `<|vectortoken|>`; when it is sampled, draw the next token from a 3D Gaussian instead.
-
-I would argue a likelihood-based distribution loss is better than regression loss, so both text and vector prediction are measured in bits of entropy.
-
-I think the [octree](uni3dar_2025) is a good idea.
-The problem is that it is good only for coordinate generation, not for predicting arbitrary vectors like force. They also assume that the order in which points appear in the data does not matter and can be reordered into a BFS tree, which itself imposes an assumption on the data. Both are things I would like to avoid.
-The merit of BFS is efficient common-ancestor path compression — no need to repeat the ancestors when generating siblings. However, we make this observation: embedding and encoding do not have to match the decoding generative process, as long as tokenization is aligned. We can embed using the continuous value directly, not via tree tokens; during decoding, we repeatedly and autoregressively sample multiple octree subdivision steps from the final representation.
-I am talking about an autoregressive head for sampling a float or double-precision vector from the output of the final layer. For a 3D vector, sample from 8 octants 64 times for double precision, 32 times for float. (For a scalar, replace octants with binary halves and the step counts roughly double.)
-Autoregressive generation within a token.
-
-### In-token AR head — example: `one inch is 2.54 cm`
-
-![Continuous Token Transformer in-token AR head](../image/continuous_token_head.svg)
-
-Outer sequence is the usual LLM token stream — text plus a special numeric token (e.g. `<scalar_token>`, `<vector_token>`). A numeric token branches off into a small inner AR head conditioned only on that token's final hidden state (no extra context attention), emitting bits coarse → fine: sign (1 bit), exponent (11 bits, MSB → LSB), mantissa (52 bits, MSB → LSB) — 64 inner steps for a double, 32 for a float.
-
-For a 3D vector, replace `<scalar_token>` with `<vector_token>` and emit all three axes jointly per step, so each subtoken is one of `2^3 = 8` octant states (one bit per axis at the current depth). Same coarse-to-fine ordering, same K, preserves cross-axis correlation.
-
-Compression: multiple bit-levels can be packed into one inner subtoken (e.g. `2^16 = 65536` sub-vocab states sampling 4 times for a double), trading inner-step count for a wider per-step vocab. Not performance-critical since the inner head is light-weight.
-
-Source: [continuous_token_head.d2](../image/continuous_token_head.d2) — render with `d2 --layout elk continuous_token_head.d2 continuous_token_head.svg`.
+Moved to [CTT/README.md#architecture](../../CTT/README.md#architecture). Open design questions tracked in [CTT/README.md#open-design-questions](../../CTT/README.md#open-design-questions).
 
 
 # [Related Work](/knowledge/ai/survey_3d_priors.md)

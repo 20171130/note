@@ -11,9 +11,50 @@ Levine et al. 2025, FAIR Chem. First arxiv release date unchecked; latest versio
 
 ## On-disk format (FAIR-SC release)
 
-Each split is 80–200 `*.aselmdb` shards. A shard is a plain LMDB with integer-string keys (`b'1'`, `b'2'`, …); each value is `zlib.compress(json.dumps(record))`. No fairchem install needed to read — `lmdb` + `zlib` + `json` is enough.
+Each split is 80–200 `*.aselmdb` shards. **Format is LMDB + zlib + JSON, mixed; not binary npz, not plain text.** No fairchem install needed to read — `lmdb` + `zlib` + `json` is enough.
 
-The record is an ASE-dict with the usual `numbers`, `positions`, `cell`, `energy`, `forces` at the top, and the OMol-specific fields under `record["data"]`: `data_id` (source dataset, e.g. `ani2x`, `metal_complexes`, `elytes`, `biomolecules`, `geom_orca6`, `orbnet_denali`, `spice`, `trans1x`, `rgd`, `reactivity`), `charge`, `spin` (multiplicity), `num_atoms`, `composition`, plus DFT details (`n_scf_steps`, `homo_lumo_gap`, Mulliken/Löwdin/NBO charges, etc.).
+Layers (outermost first), probed on `val/data0000.aselmdb`:
+
+1. **LMDB** B-tree key-value store, one file per shard. This shard has 36,187 records.
+2. **Keys**: short ASCII byte strings `b'1'`, `b'2'`, … (no metadata key).
+3. **Values**: `zlib.compress(bytes)` — header `78 9c …`, default compression. Ratio ≈ 2× (7 KB → 15 KB on a 112-atom record).
+4. **Payload**: UTF-8 **JSON text** of an ASE-dict.
+5. **Numeric arrays inside the JSON** use ASE's envelope `{"__ndarray__": [shape, dtype, flat_list]}` — values are JSON numbers, so float64 is stored as decimal text. That's why a single record is ~15 KB instead of ~3 KB raw bytes.
+
+### Top-level JSON keys
+```
+numbers, positions, unique_id, calculator, calculator_parameters,
+energy, forces, cell, pbc, ctime, user, mtime, data
+```
+- `numbers` int64[N], `positions` float64[N,3], `forces` float64[N,3], `energy` float, `cell` float64[3,3], `pbc` bool[3].
+- `cell` / `pbc` are present but meaningless (molecules-only; `pbc` always all-False).
+
+### `data` sub-dict (OMol-specific)
+```
+source, reference_source, data_id, charge, spin, num_atoms, num_electrons,
+num_ecp_electrons, n_scf_steps, n_basis, core_hours, unrestricted, nl_energy,
+integrated_densities, homo_energy, homo_lumo_gap, s_squared, s_squared_dev,
+warnings, fmax, mulliken_charges, lowdin_charges, composition
+```
+- `data_id` ∈ {`ani2x`, `metal_complexes`, `elytes`, `biomolecules`, `geom_orca6`, `orbnet_denali`, `spice`, `trans1x`, `rgd`, `reactivity`}.
+- `charge` int, `spin` int multiplicity, `composition` string like `B1Br1C39F3H47N5O14P1Sb1`.
+- `mulliken_charges` / `lowdin_charges` / `homo_lumo_gap` are usable secondary targets.
+- Other DFT fields (`n_scf_steps`, `n_basis`, `core_hours`, ...) are training metadata.
+
+### Reader
+```python
+import lmdb, zlib, json, numpy as np
+env = lmdb.open(path, subdir=False, readonly=True, lock=False,
+                readahead=False, meminit=False, max_readers=128)
+with env.begin() as txn:
+    rec = json.loads(zlib.decompress(txn.get(b'1')))
+def ndarr(v):
+    if isinstance(v, dict) and "__ndarray__" in v:
+        s, d, dat = v["__ndarray__"]
+        return np.asarray(dat, dtype=d).reshape(s)
+    return np.asarray(v)
+```
+Working example: `CTT/omol25_eval/eval_baseline.py:44` (`iter_aselmdb`) + `:77` (`record_to_atoms`).
 
 See [work/multimodal.md](../../work/multimodal.md#omol25-on-disk) for per-split statistics from this dataset on `fair-sc-3`.
 
