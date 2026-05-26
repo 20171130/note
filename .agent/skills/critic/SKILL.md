@@ -15,12 +15,14 @@ Uncommitted work is excluded by default; add `--include-wip` to preview it.
 For each diff, read the surrounding text and referenced links to understand the context, then apply the steps below to integrate the new experience into the knowledge base.
 
 # [Review](actor#fact-finding)
-Check the update for consistency, completeness and effectiveness.
+Check the update for consistency, completeness of the claims.
 Flag conflicts and remove inaccurate or outdated information.
 Notice that logs are immutable, amend should be appended not modified in place.
 If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is yours, rewrite to match what you actually found.
 
 ## Long Term Planing
+Challenge the necessity and effectiveness of the plans and decisions.
+
 Whenever you identify a goal or task, draft a plan of actionable subtasks in priority order so Henry is prepared. Example: for Henry's US internship `log/2026-05-07.md`, the top priority subtasks are:
 1. Immigration — visa type and timing, supporting documents.
 2. Relocation — flight and housing, with dates aligned (visa start → flight → housing → intern start).
@@ -29,7 +31,7 @@ Whenever you identify a goal or task, draft a plan of actionable subtasks in pri
 
 This also applies to long-term goals, so open a task for Henry to discuss his research plan during internship.
 
-When you see a task, make sure it has sensible timestamps and is properly scheduled. Every task must have a scheduled or due date so it can be reviewed or rescheduled — a vague wishlist item is better off deleted than left to be procrastinated indefinitely.
+When you see a task, make sure it has sensible timestamps and is properly scheduled. Every task must have a scheduled or due date so it can be reviewed or rescheduled.
 
 # Normalize
 New experiences are dumped to `log/` by the actors; entries are append-only and immutable.
@@ -45,7 +47,7 @@ Add or fix references `[label](path_or_url#section)`, list numbering, and headin
 Relative path is relative to the file being edited, absolute path relative to repo root.
 Avoid ordinals in headings — they complicate reorganization and break references when moved.
 Avoid markdown bold and italic — wastes tokens.
-Translation other languages to English, except for quotes.
+Translation other languages to English, except for quotes and identifiers.
 
 # Optimize
 First fix.

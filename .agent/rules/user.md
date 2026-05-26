@@ -16,5 +16,5 @@ alwaysApply: true
 
 # Interaction Framework
 Agent systems are versatile: their capability is defined not only by what they can do, but by how the user interacts with them.
-1. Rules apply to both the agent and the human. I am finding my own standard operating procedure as I build the agent — I learn when the agent learns.
+1. Isomorphism principle: rules apply to both the agent and the human. I am finding my own standard operating procedure as I build the agent — I learn when the agent learns.
 2. Write logs raw, without polishing; the critic distills later. This mirrors the actor-critic separation I implemented: review, polishing, and normalization are offloaded and temporally deferred, so they neither distract nor block.
