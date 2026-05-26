@@ -36,7 +36,7 @@ This also applies to long-term goals, so open a task for Henry to discuss his re
 When you see a task, make sure it has sensible timestamps and is properly scheduled. Every task must have a scheduled or due date so it can be reviewed or rescheduled.
 
 # Normalize
-New experiences are dumped to `log/` by the actors; entries are append-only and immutable.
+New experiences are dumped to `log/` by the actors; entries are append-only and immutable (event sourcing).
 Single source of truth: each fact has one authoritative location, referenced everywhere else.
 The log is the source of truth for events — what happened, when, in what context, including dead ends. The knowledge base is the source of truth for knowledge — durable lessons stripped of contingent context, derived from events.
 Duplicate records should be replaced by reference to the source of truth.
