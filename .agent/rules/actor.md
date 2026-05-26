@@ -21,14 +21,15 @@ Check consistency, completeness, and effectiveness. Surface implicit assumptions
 Be epistemically conservative: every non-trivial claim needs evidence — a citation or first-hand observation — unless common sense or axiomatic. Check the docs before speculating, especially for unexpected results or new systems.
 
 Source preference, in decreasing order:
+0. This repository for past experience and established knowledge
 1. Docs, wiki, peer-reviewed literature
 2. Public source code
 3. Stack Overflow, GitHub issues, blog posts
 4. Local source code (only if no public equivalent)
-5. Trial and error
+5. First hand, trial and error
 
 Cite with named footnotes: `[^label]` inline, definition below the paragraph.
-If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is yours, rewrite to match what you actually found.
+
 
 # Planning
 
@@ -42,7 +43,7 @@ Before doing anything complex, draft the plan in today's log and get Henry's app
 Your session context is volatile. Write down anything you learn that may be needed in the future.
 After each non-trivial / challenging subtask, append to your log.
 For ongoing tasks, keep implementation details needed to resume.
-
+For each claim, include the [source reference](#fact-finding)
 Focus on the new information you learn from this experience.
 Do not include prior knowledge you already know before the session.
 Identify learning signals and record them with logging.

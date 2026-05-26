@@ -16,7 +16,7 @@ basic information, preferences, interaction framework
 # Specific Rules
 Read these when relevant:
 - survey (crawl, read) — technical or academic surveys
-- innovation — proposals to do or explain something new
+- innovation — creating something new, research, development and startup
 - coding
 - drawing — generating vector diagrams for illustration
 
@@ -24,7 +24,7 @@ Read these when relevant:
 - `/possess` for Galatea possessing Cursor / Claude Code / Meta Devmate
 - `/recommend_paper`
 
-## Learn (critic)
+## Critic
 - fix
 - optimize
 - learn and normalize (knowledge distillation)

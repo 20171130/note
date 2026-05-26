@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
-# Tools for the learner — review repo changes since the last scan, mark the
+# Tools for the critic — review repo changes since the last scan, mark the
 # new baseline, and sync the baseline + notes across machines.
 #
 # Baseline is stored in the git branch `learner-baseline` so it propagates via
 # push/pull. If unset, falls back to the root commit (everything is new).
 #
 # Usage:
-#   learn.sh status                                show baseline, unscanned count, working tree, ahead/behind
-#   learn.sh diff [--name-only] [--include-wip]   show changes since last scan
-#   learn.sh mark                                  record HEAD as scanned
-#   learn.sh base                                  print the current baseline commit
-#   learn.sh pull                                  pull current branch + learner-baseline from origin
-#   learn.sh push                                  push current branch + learner-baseline to origin
-#   learn.sh possess                               regenerate Devmate/Claude at $HOME and Cursor at repo
-#   learn.sh sync                                  pull; if remote had updates stop, else mark + push + possess
-#   learn.sh commit [git commit args...]           git commit as Galatea (--amend/--reset-author forbidden)
-#   learn.sh help                                  show this help
+#   critic.sh status                                show baseline, unscanned count, working tree, ahead/behind
+#   critic.sh diff [--name-only] [--include-wip]   show changes since last scan
+#   critic.sh mark                                  record HEAD as scanned
+#   critic.sh base                                  print the current baseline commit
+#   critic.sh pull                                  pull current branch + learner-baseline from origin
+#   critic.sh push                                  push current branch + learner-baseline to origin
+#   critic.sh possess                               regenerate Devmate/Claude at $HOME and Cursor at repo
+#   critic.sh sync                                  pull; if remote had updates stop, else mark + push + possess
+#   critic.sh commit [git commit args...]           git commit as Galatea (--amend/--reset-author forbidden)
+#   critic.sh help                                  show this help
 
 set -euo pipefail
 
@@ -66,7 +66,7 @@ cmd_base() {
   if [[ -n "$b" ]]; then
     echo "$b"
   else
-    echo "no baseline set; run \`learn.sh mark\` to set one" >&2
+    echo "no baseline set; run \`critic.sh mark\` to set one" >&2
     return 1
   fi
 }
@@ -108,9 +108,9 @@ cmd_status() {
 cmd_pull() {
   local cur
   cur=$(current_branch)
-  echo "pulling $cur from $REMOTE..." >&2
-  if ! git pull --ff-only "$REMOTE" "$cur"; then
-    echo "pull: $cur cannot fast-forward (local commits diverge from $REMOTE/$cur); rebase or merge manually, then retry" >&2
+  echo "pulling $cur from $REMOTE (rebase + autostash)..." >&2
+  if ! git pull --rebase --autostash "$REMOTE" "$cur"; then
+    echo "pull: $cur rebase failed; resolve conflicts with \`git rebase --continue\` (or \`--abort\`) then retry" >&2
     return 1
   fi
   if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null 2>&1; then
@@ -163,7 +163,7 @@ cmd_sync() {
   if [[ "$head_before" != "$head_after" && "$head_after" != "$baseline_after" ]]; then
     base_for_count="${baseline_after:-$(git rev-list --max-parents=0 HEAD | tail -1)}"
     n=$(git rev-list --count "$base_for_count..HEAD")
-    echo "sync: pulled $n unreviewed commit(s) past baseline $(short_commit "$baseline_after"); review with \`learn.sh diff\` then rerun \`learn.sh sync\`" >&2
+    echo "sync: pulled $n unreviewed commit(s) past baseline $(short_commit "$baseline_after"); review with \`critic.sh diff\` then rerun \`critic.sh sync\`" >&2
     return 1
   fi
   cmd_mark
@@ -180,7 +180,7 @@ cmd_commit() {
   for arg in "$@"; do
     case "$arg" in
       --amend|--reset-author)
-        echo "learn.sh commit: $arg is forbidden; run plain \`git commit $arg\` explicitly when you intend to rewrite history" >&2
+        echo "critic.sh commit: $arg is forbidden; run plain \`git commit $arg\` explicitly when you intend to rewrite history" >&2
         return 2 ;;
     esac
   done
