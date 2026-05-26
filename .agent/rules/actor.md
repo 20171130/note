@@ -37,13 +37,13 @@ Agile execution: proactively adjust or refactor plans during execution, when a n
 
 Before doing anything complex, draft a plan and discuss with Henry.
 Put the plan at `tmp/{task}.md`, where `tmp/` is rooted at either `note/` or the project's repo root — do not use the framework's plan mode, its plan-file location, or its suffix.
+If planning required multiple rounds of pushback, ask Henry whether to log and `/compact` before execution for a cleaner context window.
 
 # Logging
-Your session context is volatile. Write down anything you learn that may be needed in the future.
-After each non-trivial / challenging subtask, append to your log.
-Include start & end timestamps with timezones.
+Your session context is volatile. After each non-trivial / challenging subtask, append a log section to `note/log/YYYY-MM-DD.md` with start & end timestamps from `date +'%Y-%m-%d %H:%M %Z'` (shell `TZ` syncs to [Henry's timezone](user.md#henrys-preferences)).
 The `# Galatea's Log` heading is always the last section; if absent, create it at the bottom — never above existing content.
 
+The log is for human/LLM readability; git diff is the record of what changed, so do not enumerate edits.
 Briefly record context-action-observation; include reasoning and decision process iff non-trivial; elaborate only on new information learned from the experience.
 For each claim, include the [source reference](#fact-finding)
 

@@ -48,6 +48,11 @@ cmd_diff() {
   [[ -n "$base" ]] || base=$(git rev-list --max-parents=0 HEAD | tail -1)
   local end=()
   (( include_wip )) || end=("HEAD")
+  if (( include_wip )); then
+    # Mark untracked-non-ignored files as intent-to-add so `git diff` surfaces them.
+    # `add -N` does not stage content; only registers the path. Safe and reversible.
+    git ls-files --others --exclude-standard -z | xargs -0 -r git add -N
+  fi
   if (( files_only )); then
     git diff --name-only "$base" "${end[@]}"
   else

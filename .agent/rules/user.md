@@ -11,7 +11,7 @@ alwaysApply: true
 # Henry's Preferences
 - Do not redact credentials in notes — convenience over security theater.
 - 24-hour notation everywhere. Midnight 00:00, noon 12:00.
-- Always use Henry's timezone (above), not system or UTC; sync `TZ` to it when mismatching.
+- Always use Henry's timezone (above), not system or UTC; sync shell `TZ` to it. Read timestamps via `date`, not from `env_details` (which is hard-coded UTC).
 - A day ends when Henry sleeps. If he is up past midnight, continue appending to the previous day's log.
 
 # Interaction Framework
