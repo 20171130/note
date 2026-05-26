@@ -26,6 +26,15 @@ alwaysApply: false
 5. LOGGING AND MLOPS — JSONL ALONGSIDE THE DASHBOARD
    When training runs / long jobs log to a human dashboard (wandb, tensorboard, mlflow…), also write the same scalars as JSONL files under `project_root/logs/`. Dashboards are web-only and require auth — opaque to the LLM; the JSONL files are `tail`/`grep`/`jq`-able and give the agent identical observability.
 
+6. EXPERIMENT REPRODUCIBILITY
+   When launching a real experiment, append a block to `note/log/YYYY-MM-DD.md` containing:
+   - Job ID(s) and submission timestamp
+   - Commit hash + branch
+   - Full launch command(s), verbatim
+   - Hyperparameters as a flat key=value list (LR, batch, total steps, warmup, eval cadence, data split, hardware)
+   - Dashboard URL(s) if any
+   Reference this log entry from anywhere else instead of copying the block.
+
 # Debugging
 
 1. Always identify the root cause before attempting any fix.
