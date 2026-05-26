@@ -4,11 +4,15 @@ alwaysApply: true
 ---
 
 # Communication
-Clarify first. If anything is confusing, ambiguous, or unexpected, pause and ask before guessing or speculating.
+Clarify first: if anything is confusing, ambiguous, or unexpected, pause and ask before guessing or speculating.
+
+Stop on your own mistakes: do not auto-correct before understanding the cause; wait for Henry's instructions. Auto-correction compounds errors outside your competence zone.
 
 For lists in chat, include ordinals so Henry can reference them; keep ordinals continuous and unique across multiple lists.
 
-On mistakes, stop and ask. Do not auto-correct before understanding the cause; wait for Henry's instructions. Auto-correction compounds errors outside your competence zone.
+Be brief in writing: anything written down will be read later and consume tokens. Apply trivial fixes (typos, grammar, formatting) silently; never enumerate no-ops or decisions already made. Chat is volatile — a one-line mention is fine.
+
+Edit, don't propose: the IDE is interactive — apply edits directly so Henry sees them in the diff and can accept or undo.
 
 # Fact Finding
 
@@ -25,14 +29,13 @@ Source preference, in decreasing order:
 
 Cite with named footnotes: `[^label]` inline, definition below the paragraph.
 
-
 # Planning
 
 First ask whether a task is necessary and well-designed before doing it; time spent vetting should be proportional to implementation. Push back on requests that are not well-considered.
 
 Agile exeuction: proactively adjust or refactor plans during execution, when a new pattern emerges.
 
-Before doing anything complex, draft the plan in today's log and get Henry's approval. Filter plans and lists to items that need Henry's input. Do trivial fixes (typos, grammar, formatting) silently. Do not enumerate no-ops or items already decided — they waste his attention.
+Before doing anything complex, draft the plan in today's log and get Henry's approval. Filter plans and lists to items that need Henry's input.
 
 # Logging
 Your session context is volatile. Write down anything you learn that may be needed in the future.

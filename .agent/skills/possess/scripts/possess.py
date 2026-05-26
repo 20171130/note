@@ -13,8 +13,10 @@ defaulting to the parent of the .agent source). Cursor does not support
 user-level file-based rules, so per-project layout is the canonical convention
 for every target:
 
-  <target>/.llms/rules/*.md and <target>/.llms/skills/<name>/   (Devmate;
-      location is the always-apply signal, so `alwaysApply` is omitted).
+  <target>/.llms/rules/*.md, <target>/.llms/skills/<name>/, and
+      <target>/.llms/commands/<name>.md   (Devmate; location is the always-apply
+      signal, so `alwaysApply` is omitted; skill bodies are also emitted as
+      slash commands).
   <target>/.cursor/rules/*.mdc and <target>/.cursor/skills/<name>/   (Cursor;
       `description` and `alwaysApply` preserved on rules, .agent-only fields
       such as `include_rule` stripped; .md is renamed to .mdc since Cursor
@@ -256,6 +258,19 @@ def skill_content(skill_path: Path) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def devmate_command_content(skill_path: Path) -> str:
+    data = parse_frontmatter(read_text(skill_path))
+    name = skill_path.parent.name
+    display_name = name.replace("_", " ").replace("-", " ").title()
+    lines = ["---", f"displayName: {display_name}"]
+    if "description" in data:
+        lines.append(f"description: {data['description']}")
+    lines.extend(["---", ""])
+    bodies = [body for _, body in expanded_rule_parts(skill_path, set())]
+    lines.append("\n\n".join(bodies))
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def claude_command_content(skill_path: Path) -> str:
     bodies = [body for _, body in expanded_rule_parts(skill_path, set())]
     body = "\n\n".join(bodies)
@@ -324,6 +339,12 @@ def sync(config: Config, dry_run: bool) -> list[str]:
             expected_files.add(devmate_skill)
             if atomic_write(devmate_skill, skill_text, dry_run):
                 changed.append(str(devmate_skill))
+            devmate_command = config.devmate / "commands" / f"{skill_name}.md"
+            expected_files.add(devmate_command)
+            if atomic_write(
+                devmate_command, devmate_command_content(source_skill), dry_run
+            ):
+                changed.append(str(devmate_command))
         if do_cursor:
             cursor_skill = config.cursor / "skills" / skill_name / "SKILL.md"
             expected_files.add(cursor_skill)
@@ -377,7 +398,11 @@ def sync(config: Config, dry_run: bool) -> list[str]:
 
     managed_roots: list[Path] = []
     if do_devmate:
-        managed_roots.extend([config.devmate / "rules", config.devmate / "skills"])
+        managed_roots.extend([
+            config.devmate / "rules",
+            config.devmate / "skills",
+            config.devmate / "commands",
+        ])
     if do_cursor:
         managed_roots.extend([config.cursor / "rules", config.cursor / "skills"])
     if do_claude:

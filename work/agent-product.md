@@ -16,7 +16,7 @@ I remember Zijun Guo mentioned this to me, AI Xuefeng Zhang. 高考志愿填报�
 
 # Idea
 
-An AI video content creater and streamer for coffee chat — the C2C proxy-agent product I've been wanting to build since the metastable era. User-generated agent as a service: value comes from private information, not from non-scarce foundation models. Proxy form, not assistant form. Information and opportunity sit with a few people whose time is limited; AI amplifies their attention by letting a digital twin stand in for them on a 24-hour stream. The twin is a natural byproduct of working with an agent that already holds my memory, knowledge, and habits.
+An AI video content creator and streamer for coffee chat — the C2C proxy-agent product I've been wanting to build since the metastable era. User-generated agent as a service: value comes from private information, not from non-scarce foundation models. Proxy form, not assistant form. Information and opportunity sit with a few people whose time is limited; AI amplifies their attention by letting a digital twin stand in for them on a 24-hour stream. The twin is a natural byproduct of working with an agent that already holds my memory, knowledge, and habits.
 
 关于用户名，我有一个一直喜欢的名字：远洋偏在，受到远洋遍在杆菌启发。
 Pelagieremita
@@ -33,11 +33,9 @@ DeepMatch is a search engine + crowdsourcing platform for finding people, using 
 The most important reason: Low-time-cost social channel:
 
 Maintaining some social media presence may be helpful, I communicate with friends and family in person, stranger social on social media is the most low efficiency and possibly time wasting part, but it also contains most opportunities.
- like 彭志辉（稚辉君）become a tech content creator before an entreprenuer. 吴铭东 may benefit from this as well. -  a 24/7 streaming agent as a way to surface a potential partner.
+ like 彭志辉（稚辉君）became a tech content creator before becoming an entrepreneur. 吴铭东 may benefit from this as well. — a 24/7 streaming agent as a way to surface a potential partner.
 
 building an agent is building myself (Isomorphism principle), building a devmate helps me to be effective. Building a third-party facing bot helps me to communicate with others.
-
-
 
 ## Prerequisites
 Framework must stabilize first — I'm still iterating fast. Persona/character design looks like the key. Bring `soul.md` and `identity.md` back once the framework lands.

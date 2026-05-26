@@ -1,12 +1,12 @@
 ---
 name: critic
-description: Review and distll knowledge from updates. Offloaded to a separate agent. Trigger: whenever user says "learn", "reflect" or "check the updates".
+description: Review and distll knowledge from updates. Offloaded to a separate agent.
 
 ---
 
 For an agent, writing is in-context learning.
 Postmortem hindsight analysis (critic) is separated from execution (actor and user) to avoid distraction and context bloat; a separate agent — not the original executor — reviews the learned experience to ensure it is reusable.
-The actor runs tasks and dumps raw experience to `log/`; Henry writes log and knowledge directly; the critic (this skill) distills both into the knowledge base.
+The actor runs tasks and dumps raw experience to `log/`; Henry writes to the log and knowledge directly; the critic (this skill) distills both into the knowledge base.
 
 # Check the Updates
 First `.agent/skills/critic/scripts/critic.sh pull` to rebase the current branch (with autostash) onto remote and fast-forward the `learner-baseline` (marker of the commit of the last scan).
@@ -20,7 +20,7 @@ Flag conflicts and remove inaccurate or outdated information.
 Notice that logs are immutable, amend should be appended not modified in place.
 If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is yours, rewrite to match what you actually found.
 
-## Long Term Planing
+## Long Term Planning
 Challenge the necessity and effectiveness of the plans and decisions.
 
 Whenever you identify a goal or task, draft a plan of actionable subtasks in priority order so Henry is prepared. Example: for Henry's US internship `log/2026-05-07.md`, the top priority subtasks are:
