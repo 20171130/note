@@ -33,6 +33,22 @@ It works on both windows and *nix.
 Skill `scripts/` subdirectories and sibling `*.py` files are copied alongside the SKILL.md for Devmate and Cursor.
 
 
+# Devmate hooks
+
+`scripts/inject_timestamp.sh` is a Devmate `SessionStart` + `UserPromptSubmit` [hook](https://www.internalfb.com/wiki/Devmate/Devmate_Hooks/) that injects the current time in Henry's timezone as `additionalContext` (fixes the recurring `env_details`-UTC-mistagged-as-PDT bug). After possess copies it to `~/.llms/skills/possess/scripts/`, wire it once in `~/.llms/hooks.json`:
+
+```json
+{
+  "hooks": {
+    "SessionStart":     [{"hooks": [{"type": "command", "command": "/home/hangrui/.llms/skills/possess/scripts/inject_timestamp.sh", "timeout": 5}]}],
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "/home/hangrui/.llms/skills/possess/scripts/inject_timestamp.sh", "timeout": 5}]}]
+  }
+}
+```
+
+`hooks.json` itself is not possessed — it's user-machine-specific (absolute paths). Restart Devmate to load.
+
+
 # Different Specifications
 For Devmate and Claude, target should be user home.
 Cursor does not support user level rules (which in configurated via Cursor IDE GUI), so need to target each project repo separately.
