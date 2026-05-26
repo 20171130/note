@@ -24,7 +24,7 @@ alwaysApply: false
    Before running any time-consuming job, tell the user the expected duration so an unexpected timeout is recognizable. Do not block on the call — launch in background and stream unbuffered output to a text file.
 
 5. LOGGING AND MLOPS — JSONL ALONGSIDE THE DASHBOARD
-   When training runs / long jobs log to a human dashboard (wandb, tensorboard, mlflow…), also write the same scalars as JSONL to a local file. Dashboards are web-only and require auth — opaque to the LLM; the JSONL file is `tail`/`grep`/`jq`-able and gives the agent identical observability.
+   When training runs / long jobs log to a human dashboard (wandb, tensorboard, mlflow…), also write the same scalars as JSONL files under `project_root/logs/`. Dashboards are web-only and require auth — opaque to the LLM; the JSONL files are `tail`/`grep`/`jq`-able and give the agent identical observability.
 
 # Debugging
 
