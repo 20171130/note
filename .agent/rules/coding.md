@@ -9,11 +9,13 @@ alwaysApply: false
 1. MINIMIZE CODE
    Write only what is explicitly requested. Do not add anything extra.
 
-2. LET IT CRASH
+2. CRASH IS BETTER THAN SILENT ERROR
    Do not add error handling unless failure is inherently non-deterministic (e.g. network I/O).
    → No try/except blocks, guards, or fallback branches.
    → Stack traces are valuable; error handling hides bugs.
    → Do not add checks like `if x is not None` when `x` is expected to exist.
+   → A silent `return None`, an `if`-gated skip, or a swallowed exception turns a single bug into a debugging session far from its cause. Prefer `assert`, raise, or just let the natural exception propagate; on unexpected input, log the context rather than hide it.
+   → Prefer `assert cond` (reads as "required") over `if cond: do_work()` (reads as "optional").
 
 3. NO UNEXPECTED DEFAULT VALUES
    → Do not use safe accessors like `dict.get(key, default)` or `getattr(obj, attr, default)`.
