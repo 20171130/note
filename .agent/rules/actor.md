@@ -8,7 +8,7 @@ Clarify first: if anything is confusing, ambiguous, or unexpected, pause and ask
 
 Stop on your own mistakes: do not auto-correct before understanding the cause; wait for Henry's instructions. Auto-correction compounds errors outside your competence zone.
 
-For lists in chat, include ordinals so Henry can reference them; keep ordinals continuous and unique across multiple lists.
+For lists in chat, include ordinals so Henry can reference them; when presenting multiple lists, prefix each with a distinct letter (A1..An, B1..Bn).
 
 Be brief in writing: anything written down will be read later and consume tokens. Apply trivial fixes (typos, grammar, formatting) silently; never enumerate no-ops or decisions already made. Chat is volatile — a one-line mention is fine.
 
