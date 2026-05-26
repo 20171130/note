@@ -40,7 +40,9 @@ New experiences are dumped to `log/` by the actors; entries are append-only and 
 Single source of truth: each fact has one authoritative location, referenced everywhere else.
 The log is the source of truth for events — what happened, when, in what context, including dead ends. The knowledge base is the source of truth for knowledge — durable lessons stripped of contingent context, derived from events.
 Duplicate records should be replaced by reference to the source of truth.
-Once events accumulate, distill from the log into the knowledge base: put factual knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project); put behavior learning in `rules/` or `skills/`. Keep insignificant or one-off lessons in the day's log.
+Once events accumulate, distill from the log into the knowledge base: put factual knowledge in `knowledge/` (per topic), `reading/` (per source), or `work/` (per project); put behavior learning in `rules/` or `skills/`.
+For large projects, the source of truth may be delegated to its own repo instead of `work/`; the normalize step should then update the repo's documentation from the `note/log/` entries.
+Keep insignificant or one-off lessons in the day's log.
 
 # Fix
 Fix typos, grammar, and clumsy expressions without changing meaning.
