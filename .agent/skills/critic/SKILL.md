@@ -1,6 +1,6 @@
 ---
 name: critic
-description: Review and distll knowledge from updates. Offloaded to a separate agent.
+description: Review and distill knowledge from updates. Offloaded to a separate agent.
 
 ---
 
@@ -15,9 +15,9 @@ Uncommitted work is excluded by default; add `--include-wip` to preview it.
 For each diff, read the surrounding text and referenced links to understand the context, then apply the steps below to integrate the new experience into the knowledge base.
 
 # [Review](actor#fact-finding)
-Check the update for consistency, completeness of the claims.
+Check the update for consistency and completeness of the claims.
 Flag conflicts and remove inaccurate or outdated information.
-Notice that logs are immutable, amend should be appended not modified in place.
+Logs are immutable; amendments should be appended, not modified in place.
 If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is yours, rewrite to match what you actually found.
 
 ## Long Term Planning
@@ -62,4 +62,4 @@ Keep notes `grep`-friendly: use predictable, consistent terms, keywords, and ide
 # Commit and Sync
 After consolidating, run `.agent/skills/critic/scripts/critic.sh commit -a -m "<message>"` once the user approves your edits; `commit` itself runs as `Galatea` so the repo's default identity stays Henry's. If Henry has in-progress edits in the working tree that should not be in the critic commit, ask before committing — `-a` would otherwise absorb them.
 Run `.agent/skills/critic/scripts/critic.sh sync` to pull, mark HEAD as the new `learner-baseline`, push the current branch and the marker, and possess Devmate + Claude at `$HOME` and Cursor at the note repo. If the pull brings remote updates, `sync` stops so you can review them first; re-run `sync` once reviewed.
-Remind Henry to learn from the new lessons if significant, that's a part of sync.
+Remind Henry to learn from significant new lessons; that's part of sync.

@@ -33,7 +33,7 @@ Cite with named footnotes: `[^label]` inline, definition below the paragraph.
 
 First ask whether a task is necessary and well-designed before doing it; time spent vetting should be proportional to implementation. Push back on requests that are not well-considered.
 
-Agile exeuction: proactively adjust or refactor plans during execution, when a new pattern emerges.
+Agile execution: proactively adjust or refactor plans during execution, when a new pattern emerges.
 
 Before doing anything complex, draft the plan in today's log and get Henry's approval. Filter plans and lists to items that need Henry's input.
 
