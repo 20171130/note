@@ -4,12 +4,25 @@
 
 Login node: `hangrui-login-0`. SLURM cluster: `fair-sc-3`. GPU partitions `h100` (8×H100), `h200` (8×H200).
 
-Scheduling is by QOS prefix, not `--partition` (`--partition=h100` is ignored). Available `ocp` QOSes:
-- `h100_dev`: smoke tests, fastest to start. Empirically a few seconds queue wait for single-GPU jobs (verified across ~12 submissions 2026-05-24). Default for iterative scripting; 15-min time limit.
-- `h100_lowest`: long queue, default for most jobs.
-- `h100_ocp_high`: real OCP runs.
-- `h100_alignment_shared`.
-- `h200_*` mirrors.
+Scheduling is by QOS prefix, not `--partition` (`--partition=h100` is ignored). Available `ocp` QOSes (priority, group GPU cap, per-user GPU cap, MaxWall — `sacctmgr show qos` 2026-05-27):
+
+| QOS | Pri | Group cap (H100/H200) | Per-user cap | MaxWall | Use |
+|---|---|---|---|---|---|
+| `*_dev` | 100 | 2760 / 7432 | 16, 2 nodes | 24h (`DenyOnLimit`) | smoke tests; few-sec queue (verified 2026-05-24) |
+| `*_ocp_high` | 100 | 512 / 520 | — | — | real OCP runs; clear w/ Ray or Zach first |
+| `*_alignment_shared` | **5** | 1432 / 3424 | 1024 | — | **default for regular experiments** |
+| `*_lowest` | 1 | 2760 / 7432 | 1024 | — | fallback only; in practice rarely scheduled |
+
+`*_alignment_shared` is the go-to over `*_lowest`. Empirically (2026-05-27 12:59 PDT):
+
+| QOS | Running GPUs | Cap util | Pending | PD/RUN |
+|---|---|---|---|---|
+| `h100_alignment_shared` | 1420 | 99% | 170 | 0.12 |
+| `h100_lowest` | 74 | 2.7% | 320 | 4.3 |
+| `h200_alignment_shared` | 1348 | 39% | 868 | 0.64 |
+| `h200_lowest` | 8 | 0.1% | 336 | 42 |
+
+`*_lowest` has huge quota headroom but pri 1 means it almost never runs — higher-priority QOSes (`*_ram_high`, `*_dream_high`, `*_sage_high`, …) fill the cluster. `*_alignment_shared` at pri 5 is the lowest QOS that actually gets scheduled.
 
 `/storage/home/$USER` is FSx/NFS, shared across login and compute. `/tmp` is per-node — scripts and outputs must live under `$HOME`. Other users' homes are 0700; paths referenced in their config files (e.g. `mshuaibi/micromamba/envs/…` cited in OMol25 `canonical_config.yaml`) are not reusable. Verify with `ls` before planning around them.
 
