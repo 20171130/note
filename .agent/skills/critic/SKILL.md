@@ -17,7 +17,7 @@ For each diff, read the surrounding text and referenced links to understand the 
 
 # [Review](actor#fact-finding)
 Check the update for consistency and completeness of the claims.
-If the log is about implementing code, review the code as well.
+If the log is about implementing code, review the code and documentation as well.
 Flag conflicts and remove inaccurate or outdated information.
 Logs are immutable; amendments should be appended, not modified in place.
 If a claim lacks support: when it is Henry's, leave the text and flag inline `[^unsupported_label]`; when it is yours, rewrite to match what you actually found.
