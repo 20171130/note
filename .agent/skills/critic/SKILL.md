@@ -15,18 +15,20 @@ Run `.agent/skills/critic/scripts/critic.sh diff --name-only` to list files chan
 Uncommitted work is excluded by default; add `--include-wip` to preview it.
 For each diff, read the surrounding text and referenced links to understand the context, then apply the steps below to integrate the new experience into the knowledge base.
 
-# Long Term Planning
-Challenge the necessity and effectiveness of the plans and decisions.
+# Plan Review
+Each pass, audit the active day's TODO and Recurring sections. Flag:
+- overdue items (⏳ or 📅 date passed without completion)
+- items without a date, owner, or checkbox
+- items completed in the log but still unchecked in TODO
+- items duplicating or contradicting Long Term Goals
 
-Whenever you identify a goal or task, draft a plan of actionable subtasks in priority order so Henry is prepared. Example: for Henry's US internship `log/2026-05-07.md`, the top priority subtasks are:
+Tie each task to a long-term goal; if none fits, ask whether to drop or re-anchor. When subtasks have an ordering (visa → flight → housing), list them in priority order and make the blocking relationship explicit.
+
+Whenever you identify a new goal, draft actionable subtasks in priority order with `➕` (created), `⏳` (start), `📅` (due) dates; challenge necessity before scheduling. Example for Henry's US internship `log/2026-05-07.md`:
 1. Immigration — visa type and timing, supporting documents.
-2. Relocation — flight and housing, with dates aligned (visa start → flight → housing → intern start).
-3. Finances — US banking or transfer route for payroll, currency conversion ahead of expenses, emergency cash.
+2. Relocation — flight and housing, dates aligned (visa start → flight → housing → intern start).
+3. Finances — US banking or transfer for payroll, currency conversion ahead of expenses, emergency cash.
 4. Communications — US SIM live before landing.
-
-This also applies to long-term goals, so open a task for Henry to discuss his research plan during internship.
-
-When you see a task, make sure it has sensible timestamps and is properly scheduled. Every task must have a scheduled or due date so it can be reviewed or rescheduled.
 
 # Normalize
 New experiences are dumped to `log/` by the actors; entries are append-only and immutable (event sourcing).

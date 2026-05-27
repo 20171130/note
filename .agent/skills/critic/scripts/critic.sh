@@ -29,7 +29,7 @@ cd "$(git rev-parse --show-toplevel)"
 REPO_ROOT=$(git rev-parse --show-toplevel)
 POSSESS="$REPO_ROOT/.agent/skills/possess/scripts/possess.py"
 
-show_help() { sed -n '2,19p' "$0" | sed 's/^# \{0,1\}//'; }
+show_help() { awk '/^# Usage:/{p=1} p{if(!/^#/)exit; sub(/^# ?/, ""); print}' "$0"; }
 
 current_branch() { git rev-parse --abbrev-ref HEAD; }
 baseline_commit() { git rev-parse --verify --quiet "$REF" || true; }
@@ -49,9 +49,16 @@ cmd_diff() {
   local end=()
   (( include_wip )) || end=("HEAD")
   if (( include_wip )); then
-    # Mark untracked-non-ignored files as intent-to-add so `git diff` surfaces them.
-    # `add -N` does not stage content; only registers the path. Safe and reversible.
-    git ls-files --others --exclude-standard -z | xargs -0 -r git add -N
+    # Mark untracked-non-ignored files as intent-to-add so `git diff` surfaces
+    # them. `add -N` only registers paths (no content), but the entries persist
+    # in the index — capture the path list to a temp file (NULs survive) and
+    # unwind on exit. Globals so the trap can see them.
+    _WIP_ITA_FILE=$(mktemp)
+    git ls-files --others --exclude-standard -z >"$_WIP_ITA_FILE"
+    trap '[[ -n "${_WIP_ITA_FILE:-}" && -s "$_WIP_ITA_FILE" ]] && xargs -0 -a "$_WIP_ITA_FILE" git reset -q HEAD -- 2>/dev/null; [[ -n "${_WIP_ITA_FILE:-}" ]] && rm -f "$_WIP_ITA_FILE"; true' EXIT
+    if [[ -s "$_WIP_ITA_FILE" ]]; then
+      xargs -0 -a "$_WIP_ITA_FILE" git add -N --
+    fi
   fi
   if (( files_only )); then
     git diff --name-only "$base" "${end[@]}"
