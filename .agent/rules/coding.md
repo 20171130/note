@@ -44,4 +44,4 @@ alwaysApply: false
 3. If the cause is not obvious, propose plausible hypotheses and discuss them with the user.
 4. Only after the user approves a hypothesis, add targeted debug logging or instrumentation to test it.
 
-See [coding caveats](/knowledge/misc/coding_caveats.md) for narrow operational traps from past debugging — read or grep this when code review.
+See [coding caveats](/knowledge/misc/coding_caveats.md) — narrow operational traps from past debugging. During critic code review, grep using keywords from the actor's diff and log; not part of actor preflight.
