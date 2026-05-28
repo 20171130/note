@@ -1,7 +1,7 @@
 ---
 description: Code style and debugging: minimize code, no error handling unless asked, let it crash, root-cause first.
 globs: **/*.py, **/*.ts, **/*.tsx, **/*.js, **/*.jsx, **/*.go, **/*.rs, **/*.c, **/*.cc, **/*.cpp, **/*.h, **/*.hpp, **/*.java, **/*.sh, **/*.ps1, **/*.rb, **/*.lua, **/*.zig, **/*.swift, **/*.kt, **/*.scala
-alwaysApply: false
+alwaysApply: true
 ---
 
 # Code Style
@@ -44,4 +44,4 @@ alwaysApply: false
 3. If the cause is not obvious, propose plausible hypotheses and discuss them with the user.
 4. Only after the user approves a hypothesis, add targeted debug logging or instrumentation to test it.
 
-See [coding caveats](/knowledge/misc/coding_caveats.md) — narrow operational traps from past debugging. During critic code review, grep using keywords from the actor's diff and log; not part of actor preflight.
+See [coding caveats](/knowledge/misc/coding_caveats.md) — narrow operational traps from past debugging. During critic code review, grep it with keywords from the actor's diff and log.
