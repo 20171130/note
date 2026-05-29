@@ -1,5 +1,21 @@
 
 # TODO
+Pick at a package at Meta, ddl 0602
+Return the extra Keon on 0529
+```
+For your protection, we suggest all returns should be sent via a traceable carrier.
+The product(s) need to be returned to our warehouse within 7 days from the delivery date indicated by the carrier in association with your tracking details.
+In this case the return shipping cost will fall under your responsibility, since we do not provide return labels.
+Please note that picking, packing, and shipping charges have already accrued, and this will be your responsibility if you wish to cancel at this point.
+This amount will be $25 USD and it will be deducted from your refund.
+Please add to the original box “ORDER 67259449- RETURN”, this way our partner’s warehouse can confirm the return of your order more quickly.
+The original sender’s address is on the original box:
+
+Rakuten Super Logistics
+880 Wigwam Pkwy
+89014, Henderson, NV
+United States
+```
 
 ## Upcoming
 read Karpathy's Claude.md
