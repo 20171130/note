@@ -1,7 +1,9 @@
 
 # TODO
-Pick at a package at Meta, ddl 0602
-Return the extra Keon on 0529
+- [ ] Pick up a package at Meta 📅 2026-06-02
+- [ ] Return the extra Keon 📅 2026-05-29 [^keon_return]
+
+[^keon_return]: ⚠️ overdue as of 2026-05-30 — package not yet shipped. 7-day return window from delivery date.
 ```
 For your protection, we suggest all returns should be sent via a traceable carrier.
 The product(s) need to be returned to our warehouse within 7 days from the delivery date indicated by the carrier in association with your tracking details.
@@ -18,38 +20,35 @@ United States
 ```
 
 ## Upcoming
-read Karpathy's Claude.md
+- [ ] read Karpathy's Claude.md
+- [ ] Wrap up on [VPO](/work/VPO.md) by 2026-06-01
+- [ ] Work on [Continuous Token Transformers](/work/multimodal.md)
+- [ ] [AI agent](/work/agent-product.md) — 高考志愿填报 📅 2026-06-15. Strongly related to: think about how to build connection ➕ 2026-05-08 ⏳ 2026-05-24 [^conn_overdue]
 
-- Wrap up on [VPO](/work/VPO.md) by 2026-06-01
-- Work on [Continuous Token Transformers](/work/multimodal.md)
-[AI agent](/work/agent-product.md). Deadline is Mid June, 高考志愿填报 📅 2026-06-15
-strongly related to: Think about how to build connection ➕ 2026-05-08 ⏳ 2026-05-24
+[^conn_overdue]: ⚠️ start date 2026-05-24 passed without progress; re-anchor or drop.
 
 ## Research
-- Understand ARC AGI
-- Credit assignment for [long term memory](</work/Long Term Memory.md>)
+- [ ] Understand ARC AGI
+- [ ] Credit assignment for [long term memory](</work/Long Term Memory.md>)
 - [ ] Selfish neural networks ➕ 2026-05-08 ⏳ 2026-07-01
 - [ ] Open source Euclid Omni ⏳ 2026-07-01
-- [ ] NPython / NaturalJS — automatic optimizable harnessing framework ⏳ 2026-06-17
-    I saw related papers about this? code as harness framework
+- [ ] NPython / NaturalJS — automatic optimizable harnessing framework ⏳ 2026-06-17 (related papers? code-as-harness framework)
 
 ## MISC
-- [ ] Open bank accounts after SSN: Chase (in-branch) + Schwab + IBKR US Pro 📅 2026-06-10
-[account_allocation](../knowledge/finance/account_allocation.md) [us_accounts](../knowledge/finance/us_accounts.md)
-- [ ] Update SSN on I9 and Workday portal (new I9 pw sent to Meta email) 2026-06-10
+- [ ] Open bank accounts after SSN: Chase (in-branch) + Schwab + IBKR US Pro 📅 2026-06-10. See [account_allocation](knowledge/finance/account_allocation.md), [us_accounts](knowledge/finance/us_accounts.md)
+- [ ] Update SSN on I9 and Workday portal (new I9 pw sent to Meta email) 📅 2026-06-10
 - [ ] Revise the free bike (Di Wu sent me the link in wechat group) and Clipper card Meta offers ⏳ 2026-06-01
 - [ ] Request Clipper card for public transit + enroll in Optum commuter benefits ➕ 2026-05-11 ⏳ 2026-06-01
-Work on investment agentic system (based on my notion note, alpha-beta-sigma system)
-Work on time management agentic system
-Think about getting US travel visa while in the US
-Think about when returning to Canada, Meta change to parttime remote, Canada enroll as full time student
+- [ ] Work on investment agentic system (based on my notion note, alpha-beta-sigma system)
+- [ ] Work on time management agentic system
+- [ ] Think about getting US travel visa while in the US
+- [ ] Plan return to Canada: Meta change to part-time remote, Canada enroll as full-time student
 
 ## Hobby
 - [ ] Plan whale watching trip in Monterey Bay, get binoculars for that ➕ 2026-05-09 ⏳ 2026-06-17
 
 ## Canada Accounts
-- [ ] Unlock RBC account after returning to Canada [2026-05-07](2026-05-07.md) ➕ 2026-05-08 🛫 2026-09-01 📅 2026-10-31
-check my 500 deposit cheque saved or not
+- [ ] Unlock RBC account after returning to Canada [2026-05-07](log/2026-05-07.md) ➕ 2026-05-08 🛫 2026-09-01 📅 2026-10-31 (also: check $500 deposit cheque cleared)
 - [ ] Email RBC consultant to invest excess cash beyond 21K in normal account ➕ 2026-05-12 ⏳ 2026-06-17
 
 # Recurring
@@ -63,15 +62,17 @@ check my 500 deposit cheque saved or not
 ## School
 - [ ] 10:30 - 11:30 Biweekly meeting with my professors on Mondays (13:30 ET, 10:30 PDT) 🔁 every 14 days ⏳ 2026-05-30
 ## Personal
-- [ ] Workout 🔁 every 3 days ⏳ 2026-05-28
+- [ ] Workout 🔁 every 3 days ⏳ 2026-05-28 [^workout_overdue]
 - [ ] Shower and change clothes 🔁 every day
 - [ ] go sleep before midnight, set `sleep-cycle` alarm, charge phone and laptop 🔁 every day
 - [ ] Grocery run, floss string  🔁 every week on Saturday
 - [ ] Wash clothes, dishes, and bedding 🔁 every week on Sunday
 - [ ] Talk to relatives on Sundays 17:00 🔁 every week
 
-Buy things online once mailbox and US bank account are confirmed working
-Get [tools](/knowledge/misc/tools.md), water pick
+[^workout_overdue]: ⚠️ 2 days overdue as of 2026-05-30.
+
+- [ ] Buy things online once mailbox and US bank account are confirmed working
+- [ ] Get [tools](knowledge/misc/tools.md), water pick
 
 # Long Term Goals
 Academic excellence, for my PhD degree, job and US visa status
